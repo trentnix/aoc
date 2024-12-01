@@ -9,7 +9,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strconv"
@@ -29,8 +28,7 @@ func main() {
 	choice := -1
 	inputFile := ""
 
-	var writer io.Writer
-	writer = os.Stdout
+	writer := os.Stdout
 
 	exercises := exercise.GetExercises()
 	numExercises := len(exercises)
@@ -44,7 +42,13 @@ func main() {
 	if argCount > 1 {
 		selectionNum, err := strconv.Atoi(os.Args[1])
 		if err != nil || numExercises > selectionNum {
-			log.Fatalf("Invalid exercise")
+			// the first parameter is invalid
+			failureMessage := "Invalid exercise"
+			if err != nil {
+				failureMessage += fmt.Sprintf(": %v", err)
+			}
+
+			log.Fatalf("%s", failureMessage)
 			return
 		} else {
 			choice = selectionNum
@@ -57,8 +61,11 @@ func main() {
 		if inputFile == "" {
 			exercises[selectionNum].Run(writer)
 		} else {
+			// a file was specified - read the contents of the file and pass it to the specified
+			// exercise
 			input, err := fileprocessing.ReadFile(inputFile)
 			if err != nil {
+				// error reading from the specified file
 				log.Fatalf("Could not process the specified file %s: %v", inputFile, err)
 				return
 			}
