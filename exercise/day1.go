@@ -13,9 +13,8 @@ import (
 
 // Day1 represents the data necessary to process an Exercise for the first day
 type Day1 struct {
-	name  string
-	file  string
-	order int
+	name string
+	file string
 }
 
 // GetName returns the name of the Day1 exercise

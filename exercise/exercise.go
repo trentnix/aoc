@@ -9,9 +9,8 @@ var exercises []Exercise
 // init initializes the exercises array
 func init() {
 	day1 := &Day1{
-		name:  "2024: Day 1",
-		file:  "data/day1/input.txt",
-		order: 202401,
+		name: "2024: Day 1",
+		file: "data/day1/input.txt",
 	}
 
 	RegisterExercise(day1)

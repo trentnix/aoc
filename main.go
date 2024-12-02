@@ -76,7 +76,7 @@ func main() {
 	} else {
 		// there is no argument so show the full menu
 		fmt.Print("\n")
-		fmt.Println("Welcome to solutions for the Advent of Code 2023!")
+		fmt.Println("Welcome to solutions for the Advent of Code 2024!")
 	}
 
 	for {
