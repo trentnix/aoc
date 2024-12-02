@@ -10,7 +10,7 @@ var exercises []Exercise
 func init() {
 	day1 := &Day1{
 		name:  "2024: Day 1",
-		file:  "day1/day1.txt",
+		file:  "data/day1/input.txt",
 		order: 202401,
 	}
 
