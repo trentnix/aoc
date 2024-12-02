@@ -17,12 +17,12 @@ type Day1 struct {
 	file string
 }
 
-// GetName returns the name of the Day1 exercise
+// GetName returns the name of the Day 1 exercise
 func (d *Day1) GetName() string {
 	return d.name
 }
 
-// Run executes the solution for Day1 by retrieving the default file contents and uses that data
+// Run executes the solution for Day 1 by retrieving the default file contents and uses that data
 func (d *Day1) Run(w io.Writer) {
 	if d.file == "" {
 		w.Write([]byte(fmt.Sprintf("A default input file is not specified.")))
@@ -38,7 +38,7 @@ func (d *Day1) Run(w io.Writer) {
 	d.RunFromInput(w, input)
 }
 
-// RunFromInput executs the Day1 solution using the provided input data
+// RunFromInput executs the Day 1 solution using the provided input data
 func (d *Day1) RunFromInput(w io.Writer, input []string) {
 	// parse the input into two arrays
 	left, right, err := d.parseIntoLists(input)

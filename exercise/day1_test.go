@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestSumSmallestDistances(t *testing.T) {
+func TestDay1SumSmallestDistances(t *testing.T) {
 	input := []string{
 		"3   4",
 		"4   3",
@@ -29,7 +29,7 @@ func TestSumSmallestDistances(t *testing.T) {
 	}
 }
 
-func TestSumSimilarityScores(t *testing.T) {
+func TestDay1SumSimilarityScores(t *testing.T) {
 	input := []string{
 		"3   4",
 		"4   3",
