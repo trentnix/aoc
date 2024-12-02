@@ -54,14 +54,73 @@ func (d *Day2) RunFromInput(w io.Writer, input []string) {
 
 	// part 1
 	w.Write([]byte(fmt.Sprintf("Day 2 - Part 1 - The sum of safe reports is %d.\n", numSafeReports)))
+
+	numSafeReports = d.Part2(reports)
+
+	// part 2
+	w.Write([]byte(fmt.Sprintf("Day 2 - Part 2 - The sum of safe reports is %d.\n", numSafeReports)))
 }
 
 // Part1 counts which Report entries are "safe"
 func (d *Day2) Part1(reports []Report) int {
 	numSafeReports := 0
 	for _, report := range reports {
-		if d.isReportSafe(report) {
+		if isReportSafe, _ := d.isReportSafe(report); isReportSafe {
 			numSafeReports++
+		}
+	}
+
+	return numSafeReports
+}
+
+// Part2 counts which Report entries are "safe" if any of the elements are removed
+func (d *Day2) Part2(reports []Report) int {
+	numSafeReports := 0
+	for _, report := range reports {
+		isReportSafe, indexFailed := d.isReportSafe(report)
+		if isReportSafe {
+			numSafeReports++
+		} else {
+			if indexFailed > 0 {
+				// the index where the check failed is valid, remove the index and try again
+				switch {
+				case indexFailed <= 0:
+					continue
+				case indexFailed == 2:
+					// this is a special case - any of the first three elements could be the issue
+					isReportSafe, _ = d.isReportSafe(d.reportWithoutIndex(report, 0))
+					if isReportSafe {
+						numSafeReports++
+						continue
+					}
+
+					isReportSafe, _ = d.isReportSafe(d.reportWithoutIndex(report, 1))
+					if isReportSafe {
+						numSafeReports++
+						continue
+					}
+
+					isReportSafe, _ = d.isReportSafe(d.reportWithoutIndex(report, 2))
+					if isReportSafe {
+						numSafeReports++
+						continue
+					}
+				case indexFailed <= len(report):
+					isReportSafe, _ = d.isReportSafe(d.reportWithoutIndex(report, indexFailed-1))
+					if isReportSafe {
+						numSafeReports++
+						continue
+					}
+
+					isReportSafe, _ = d.isReportSafe(d.reportWithoutIndex(report, indexFailed))
+					if isReportSafe {
+						numSafeReports++
+						continue
+					}
+				default:
+					continue
+				}
+			}
 		}
 	}
 
@@ -99,9 +158,13 @@ func (d *Day2) parseIntoReports(input []string) ([]Report, error) {
 //
 //	all levels are either all increasing or all decreasing
 //	any two adjacent levels differ by at least one and at most three
-func (d *Day2) isReportSafe(r Report) bool {
+//
+// If the report is safe, 'true' is returned (and the additional return value can be
+// ignored). If the report is unsafe, 'false' is returned and the index that failed is
+// returned (if it exists).
+func (d *Day2) isReportSafe(r Report) (bool, int) {
 	if len(r) <= 1 {
-		return false
+		return false, -1
 	}
 
 	var isIncreasing bool
@@ -112,27 +175,27 @@ func (d *Day2) isReportSafe(r Report) bool {
 	}
 
 	if !d.isLevelDifferenceSafe(levelDifference, 1, 3) {
-		return false
+		return false, 1
 	}
 
 	for index := 1; index < len(r)-1; index++ {
 		levelDifference = int(r[index]) - int(r[index+1])
 		if isIncreasing {
 			if levelDifference > 0 {
-				return false
+				return false, index + 1
 			}
 		} else {
 			if levelDifference < 0 {
-				return false
+				return false, index + 1
 			}
 		}
 
 		if !d.isLevelDifferenceSafe(levelDifference, 1, 3) {
-			return false
+			return false, index + 1
 		}
 	}
 
-	return true
+	return true, -1
 }
 
 // isLevelDifferenceSafe determines whether the absolute value of the difference value
@@ -147,4 +210,17 @@ func (d *Day2) isLevelDifferenceSafe(difference int, min int, max int) bool {
 	}
 
 	return true
+}
+
+// reportWithoutIndex returns a copy of the Report minus the specified index
+func (d *Day2) reportWithoutIndex(r Report, index int) Report {
+	if index < 0 || len(r) <= 0 || index > len(r) {
+		return Report{}
+	}
+
+	newReport := make(Report, 0, len(r)-1)
+	newReport = append(newReport, r[:index]...)
+	newReport = append(newReport, r[index+1:]...)
+
+	return newReport
 }
