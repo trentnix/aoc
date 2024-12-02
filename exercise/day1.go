@@ -51,9 +51,16 @@ func (d *Day1) RunFromInput(w io.Writer, input []string) {
 	sumDifferences := d.Part1(left, right)
 
 	// part 1
-	w.Write([]byte(fmt.Sprintf("Day 1 - Part 1 - The sum of the distances between the left and right list is %d.", sumDifferences)))
+	w.Write([]byte(fmt.Sprintf("Day 1 - Part 1 - The sum of the distances between the left and right list is %d.\n", sumDifferences)))
+
+	sumSimilarityScores := d.Part2(left, right)
+
+	// part 2
+	w.Write([]byte(fmt.Sprintf("Day 1 - Part 2 - The sum of the similarity scores between the left and right lists is %d.\n", sumSimilarityScores)))
 }
 
+// parseIntoLists parses the string input into two integer slices. An error is returned
+// if there was an error during the parsing effort.
 func (d *Day1) parseIntoLists(input []string) ([]int, []int, error) {
 	var left, right []int
 
@@ -79,6 +86,9 @@ func (d *Day1) parseIntoLists(input []string) ([]int, []int, error) {
 	return left, right, nil
 }
 
+// Part1 calculates the differences between the smallest value in each list, then moves to the
+// second smallest number in each and adds that differences to the first differences, and so on.
+// The value returned is the sum of all of the differences.
 func (d *Day1) Part1(l []int, r []int) int {
 	// Sort the left and right slices
 	sort.Ints(l)
@@ -96,6 +106,24 @@ func (d *Day1) Part1(l []int, r []int) int {
 		} else {
 			sum += r[i] - l[i]
 		}
+	}
+
+	return sum
+}
+
+// Part2 discerns a "similary score" by counting the instances of each left value in the right list
+// and multiplying the number of instances it appears times the value itself. So if 3 is the value on
+// the left side and it appears 4 times in the right list, 3 * 4 = 12. This method returns the sum of
+// similarity scores.
+func (d *Day1) Part2(l []int, r []int) int {
+	repeatCount := make(map[int]int)
+	for _, val := range r {
+		repeatCount[val]++
+	}
+
+	sum := 0
+	for _, val := range l {
+		sum += repeatCount[val] * val
 	}
 
 	return sum
