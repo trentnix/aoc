@@ -1,4 +1,4 @@
-// day2.go is the implementation for the second day of the Advent of Code 2024
+// day_template.go is the implementation for the TBD day of the Advent of Code 2024
 package exercise
 
 import (
@@ -9,19 +9,19 @@ import (
 )
 
 type (
-	// Day2 represents the data necessary to process the Exercise
+	// DayX represents the data necessary to process the Exercise
 	DayX struct {
 		name string
 		file string
 	}
 )
 
-// GetName returns the name of the Day 2 exercise
+// GetName returns the name of the Day X exercise
 func (d *DayX) GetName() string {
 	return d.name
 }
 
-// Run executes the solution for Day 2 by retrieving the default file contents and uses that data
+// Run executes the solution for Day X by retrieving the default file contents and uses that data
 func (d *DayX) Run(w io.Writer) {
 	if d.file == "" {
 		w.Write([]byte(fmt.Sprintf("A default input file is not specified.")))
@@ -37,7 +37,7 @@ func (d *DayX) Run(w io.Writer) {
 	d.RunFromInput(w, input)
 }
 
-// RunFromInput executs the Day 2 solution using the provided input data
+// RunFromInput executs the Day X solution using the provided input data
 func (d *DayX) RunFromInput(w io.Writer, input []string) {
 	// data, err := // parse the data
 	// if err != nil {
