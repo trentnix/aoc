@@ -10,7 +10,7 @@ func TestDay3AddMultiplicationResults(t *testing.T) {
 	}
 
 	d3 := Day3{}
-	data, err := d3.parseInput(input)
+	data, err := d3.parseInputRaw(input)
 	if err != nil {
 		t.Errorf("There was an error parsing the input")
 		return
@@ -30,7 +30,7 @@ func TestDay3P2(t *testing.T) {
 	}
 
 	d3 := Day3{}
-	data, err := d3.parseInput(input)
+	data, err := d3.parseInputApplyConditionals(input)
 	if err != nil {
 		t.Errorf("There was an error parsing the input")
 		return
