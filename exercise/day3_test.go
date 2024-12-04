@@ -20,11 +20,11 @@ func TestDay3AddMultiplicationResults(t *testing.T) {
 	calculatedValue := d3.Part1(data)
 
 	if calculatedValue != expectedValue {
-		t.Errorf("Day 2 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
+		t.Errorf("Day 3 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
 	}
 }
 
-func TestDay3P2(t *testing.T) {
+func TestDay3AddMultiplicationResultsDontDo(t *testing.T) {
 	input := []string{
 		"xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))",
 	}
@@ -40,6 +40,6 @@ func TestDay3P2(t *testing.T) {
 	calculatedValue := d3.Part2(data)
 
 	if calculatedValue != expectedValue {
-		t.Errorf("Day 2 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
+		t.Errorf("Day 3 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
 	}
 }

@@ -56,6 +56,11 @@ func (d *Day4) RunFromInput(w io.Writer, input []string) {
 
 	// part 1
 	w.Write([]byte(fmt.Sprintf("Day 4 - Part 1 - The number of 'XMAS' instances is %d.\n", numberOfXmasInstances)))
+
+	numberOfMasXInstances := d.Part2(grid)
+
+	// part 1
+	w.Write([]byte(fmt.Sprintf("Day 4 - Part 2 - The number of 'MAS' in an X instances is %d.\n", numberOfMasXInstances)))
 }
 
 // Part1 counts the number of instances of the word 'XMAS' in the input character (rune) grid
@@ -137,11 +142,6 @@ func (d *Day4) Part1(input [][]rune) int {
 	return countXMAS
 }
 
-// Part2
-func (d *Day4) Part2() int {
-	return 0
-}
-
 // matchXmas determines whether the word 'XMAS' is found at the four specified coordinates of
 // the input grid
 func (d *Day4) matchXmas(input [][]rune, x, m, a, s coordinate) bool {
@@ -158,4 +158,44 @@ func (d *Day4) matchXmas(input [][]rune, x, m, a, s coordinate) bool {
 		return false
 	}
 	return true
+}
+
+// Part2 counts the number of instances of the word 'MAS' that make an X
+func (d *Day4) Part2(input [][]rune) int {
+	numColumns := len(input)
+	if numColumns == 0 {
+		log.Fatalf("invalid input")
+	}
+
+	numRows := len(input[0])
+	if numRows < 4 {
+		log.Fatalf("invalid input")
+	}
+
+	countMAS := 0
+
+	for y := 1; y < numColumns-1; y++ {
+		for x := 1; x < numRows-1; x++ {
+			if d.matchMasX(input, coordinate{x, y}) {
+				countMAS++
+			}
+		}
+	}
+
+	return countMAS
+}
+
+// matchMasX returns true if, at the given coordinate, the word 'MAS' makes an overlapping
+// X with itself ('MAS' and 'MAS', 'MAS' and 'SAM', 'SAM' and 'SAM', or 'SAM' and 'MAS')
+func (d *Day4) matchMasX(input [][]rune, a coordinate) bool {
+	if input[a.y][a.x] != 'A' {
+		return false
+	}
+
+	if ((input[a.y-1][a.x-1] == 'M' && input[a.y+1][a.x+1] == 'S') || (input[a.y-1][a.x-1] == 'S' && input[a.y+1][a.x+1] == 'M')) &&
+		((input[a.y-1][a.x+1] == 'M' && input[a.y+1][a.x-1] == 'S') || (input[a.y-1][a.x+1] == 'S' && input[a.y+1][a.x-1] == 'M')) {
+		return true
+	}
+
+	return false
 }
