@@ -67,22 +67,26 @@ func (d *Day5) Part1(rules []orderingRule, pagesLists []pageNumbers) int {
 
 	rulesMap := d.getRulesMap(rules)
 	for _, pages := range pagesLists {
-		pagesAreInOrder := true
-
-		for pageIndex := 1; pageIndex < len(pages); pageIndex++ {
-			if d.hasOverlap(rulesMap[pages[pageIndex]], pages[:pageIndex]) {
-				pagesAreInOrder = false
-				break
-			}
-		}
-
-		if pagesAreInOrder {
+		if pagesAreInOrder := d.pagesAreInOrder(rulesMap, pages); pagesAreInOrder {
 			middleValue := pages[len(pages)/2]
 			sumValidMiddleValues += middleValue
 		}
 	}
 
 	return sumValidMiddleValues
+}
+
+// pagesAreInOrder determines whether, using the given rules, the pages provided are
+// listed in correct order
+func (d *Day5) pagesAreInOrder(rulesMap map[int][]int, pages []int) bool {
+	for pageIndex := 1; pageIndex < len(pages); pageIndex++ {
+		page := pages[pageIndex]
+		if d.hasOverlap(rulesMap[page], pages[:pageIndex]) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // hasOverlap determines whether a value in the first integer array overlaps with a value in
