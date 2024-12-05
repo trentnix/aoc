@@ -58,6 +58,11 @@ func (d *Day5) RunFromInput(w io.Writer, input []string) {
 
 	// part 1
 	w.Write([]byte(fmt.Sprintf("Day 5 - Part 1 - The sum of the middle page numbers is %d.\n", sumOfMiddleValues)))
+
+	sumOfReorderedMiddleValues := d.Part2(rules, pages)
+
+	// part 2
+	w.Write([]byte(fmt.Sprintf("Day 5 - Part 2 - The sum of the reordered middle page numbers is %d.\n", sumOfReorderedMiddleValues)))
 }
 
 // Part1 determines whether a list of pages is ordered correctly and, if so, it will
@@ -109,9 +114,89 @@ func (d *Day5) hasOverlap(a1, a2 []int) bool {
 	return false
 }
 
-// Part2
-func (d *Day5) Part2() int {
-	return 0
+// Part2 finds the pages lists that are out of order and fixes them, summing their
+// middle elements and returning that value
+func (d *Day5) Part2(rules []orderingRule, pagesLists []pageNumbers) int {
+	sumReorderedMiddleValues := 0
+
+	rulesMap := d.getRulesMap(rules)
+	for _, pages := range pagesLists {
+		if pagesAreInOrder := d.pagesAreInOrder(rulesMap, pages); !pagesAreInOrder {
+			// reorder the list
+			orderedPages := d.topologicalSort(pages, rulesMap)
+			middleValue := orderedPages[len(orderedPages)/2]
+			sumReorderedMiddleValues += middleValue
+		}
+	}
+
+	return sumReorderedMiddleValues
+}
+
+// topologicalSort uses Kahn's algorithm to find an ordered list of nodes (pages)
+// that works
+func (d *Day5) topologicalSort(nodes []int, edges map[int][]int) []int {
+	// Step 1: Calculate in-degree for each node in the nodes list
+	inDegree := make(map[int]int)
+	for _, node := range nodes {
+		inDegree[node] = 0 // Initialize all nodes with in-degree 0
+	}
+
+	// Calculate in-degree considering only nodes in the nodes list
+	nodeSet := make(map[int]struct{})
+	for _, node := range nodes {
+		nodeSet[node] = struct{}{}
+	}
+
+	for current, neighbors := range edges {
+		// Skip nodes not in the nodes list
+		if _, exists := nodeSet[current]; !exists {
+			continue
+		}
+
+		for _, neighbor := range neighbors {
+			// Only update in-degree for neighbors in the nodes list
+			if _, exists := nodeSet[neighbor]; exists {
+				inDegree[neighbor]++
+			}
+		}
+	}
+
+	// Step 2: Collect all nodes with in-degree 0
+	var queue []int
+	for node, degree := range inDegree {
+		if degree == 0 {
+			queue = append(queue, node)
+		}
+	}
+
+	// Step 3: Perform topological sort
+	var sorted []int
+	for len(queue) > 0 {
+		// Dequeue a node with in-degree 0
+		current := queue[0]
+		queue = queue[1:]
+
+		// Add it to the sorted result
+		sorted = append(sorted, current)
+
+		// Decrease in-degree of its neighbors
+		for _, neighbor := range edges[current] {
+			// Only decrease in-degree for neighbors in the nodes list
+			if _, exists := nodeSet[neighbor]; exists {
+				inDegree[neighbor]--
+				if inDegree[neighbor] == 0 {
+					queue = append(queue, neighbor)
+				}
+			}
+		}
+	}
+
+	// Step 4: Check for cycles
+	if len(sorted) != len(nodes) {
+		return nil // Cycle detected or invalid input
+	}
+
+	return sorted
 }
 
 // parseInput takes the input and parses it into a slice of orderingRule and a
