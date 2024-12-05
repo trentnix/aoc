@@ -57,5 +57,5 @@ func (d *Day6) Part2() int {
 }
 
 // parseData
-func (d *Day6) parseData(input []string) /* return types */ {
-}
+// func (d *Day6) parseData(input []string) /* return types */ {
+// }
