@@ -12,7 +12,7 @@
             "program": "${workspaceFolder}", // Adjust to the path where your main.go is located
             "cwd": "${workspaceFolder}", // Set the working directory to the root of your project
             "env": {},
-            "args": [], // You can add any command-line arguments your application needs here
+            "args": ["5"], // You can add any command-line arguments your application needs here
             "showLog": true
         }
     ]

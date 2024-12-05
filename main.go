@@ -59,7 +59,7 @@ func main() {
 		}
 
 		if inputFile == "" {
-			exercises[selectionNum].Run(writer)
+			exercises[selectionNum-1].Run(writer)
 		} else {
 			// a file was specified - read the contents of the file and pass it to the specified
 			// exercise
