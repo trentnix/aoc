@@ -5,50 +5,28 @@ import (
 )
 
 func TestDay6Part1(t *testing.T) {
-	// input := []string{
-	// 	"47|53",
-	// 	"97|13",
-	// 	"97|61",
-	// 	"97|47",
-	// 	"75|29",
-	// 	"61|13",
-	// 	"75|53",
-	// 	"29|13",
-	// 	"97|29",
-	// 	"53|29",
-	// 	"61|53",
-	// 	"97|53",
-	// 	"61|29",
-	// 	"47|13",
-	// 	"75|47",
-	// 	"97|75",
-	// 	"47|61",
-	// 	"75|61",
-	// 	"47|29",
-	// 	"75|13",
-	// 	"53|13",
-	// 	"",
-	// 	"75,47,61,53,29",
-	// 	"97,61,53,29,13",
-	// 	"75,29,13",
-	// 	"75,97,47,61,53",
-	// 	"61,13,29",
-	// 	"97,13,75,29,47",
-	// }
+	input := []string{
+		"....#.....",
+		".........#",
+		"..........",
+		"..#.......",
+		".......#..",
+		"..........",
+		".#..^.....",
+		"........#.",
+		"#.........",
+		"......#...",
+	}
 
-	// d5 := Day5{}
+	d6 := Day6{}
 
-	// rules, pages, err := d5.parseInput(input)
-	// if err != nil {
-	// 	t.Fatalf("Day 5 - Part 1 Test input parsing failed: %v\n", err)
-	// }
+	g := d6.parseInput(input)
+	calculatedValue := d6.Part1(g)
+	expectedValue := 41
 
-	// calculatedValue := d5.Part1(rules, pages)
-	// expectedValue := 143
-
-	// if calculatedValue != expectedValue {
-	// 	t.Errorf("Day 5 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
-	// }
+	if calculatedValue != expectedValue {
+		t.Errorf("Day 6 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
+	}
 }
 
 func TestDay6Part2(t *testing.T) {
