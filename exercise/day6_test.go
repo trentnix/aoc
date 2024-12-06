@@ -30,4 +30,26 @@ func TestDay6Part1(t *testing.T) {
 }
 
 func TestDay6Part2(t *testing.T) {
+	input := []string{
+		"....#.....",
+		".........#",
+		"..........",
+		"..#.......",
+		".......#..",
+		"..........",
+		".#..^.....",
+		"........#.",
+		"#.........",
+		"......#...",
+	}
+
+	d6 := Day6{}
+
+	g := d6.parseInput(input)
+	calculatedValue := d6.Part2(g)
+	expectedValue := 6
+
+	if calculatedValue != expectedValue {
+		t.Errorf("Day 6 - Part 2 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
+	}
 }
