@@ -53,12 +53,12 @@ func (d *Day7) RunFromInput(w io.Writer, input []string) {
 	}
 
 	// part 1
-	numTrueEquations := d.Part1(equations)
-	w.Write([]byte(fmt.Sprintf("Day 7 - Part 1 - The number of true equations is %d.\n", numTrueEquations)))
+	sumTrueEquations := d.Part1(equations)
+	w.Write([]byte(fmt.Sprintf("Day 7 - Part 1 - The sum of the true equations is %d.\n", sumTrueEquations)))
 
 	// part 2
-	// numLoops := d.Part2(g.Copy())
-	// w.Write([]byte(fmt.Sprintf("Day 7 - Part 2 - The number of new blocks that result in a loop is %d.\n", numLoops)))
+	sumTrueEquations = d.Part2(equations)
+	w.Write([]byte(fmt.Sprintf("Day 7 - Part 2 - The sum of the true equations is %d.\n", sumTrueEquations)))
 }
 
 // Part1 calculates the sum of solvable equations using an operator set of "+" and "*", if
@@ -91,10 +91,31 @@ func (d *Day7) evaluateEquationValues(e Equation, operators []string) bool {
 			val += e.Inputs[i+1]
 		case "*":
 			val *= e.Inputs[i+1]
+		case "||":
+			val = d.concatenateInt64(val, e.Inputs[i+1])
 		}
 	}
 
 	return val == e.Value
+}
+
+// concatenateInt64 takes two int64 values and returns the concatenated result
+// as if each was a string (but as an int64 value)
+func (d *Day7) concatenateInt64(a, b int64) int64 {
+	// Convert the integers to strings
+	strA := strconv.FormatInt(a, 10)
+	strB := strconv.FormatInt(b, 10)
+
+	// Concatenate the strings
+	concatenated := strA + strB
+
+	// Convert the concatenated string back to int64
+	result, err := strconv.ParseInt(concatenated, 10, 64)
+	if err != nil {
+		return -1
+	}
+
+	return result
 }
 
 // GenerateCombinations generates all possible combinations of the given operators
@@ -123,8 +144,21 @@ func (d *Day7) generateCombinations(operators []string, length int) [][]string {
 }
 
 // Part2
-func (d *Day7) Part2() int {
-	return 0
+func (d *Day7) Part2(equations []Equation) uint64 {
+	sumEquationValuesMadeTrue := uint64(0)
+	operators := []string{"+", "*", "||"}
+
+	for _, e := range equations {
+		operatorCombinations := d.generateCombinations(operators, len(e.Inputs)-1)
+		for _, operatorCombination := range operatorCombinations {
+			if d.evaluateEquationValues(e, operatorCombination) {
+				sumEquationValuesMadeTrue += uint64(e.Value)
+				break
+			}
+		}
+	}
+
+	return sumEquationValuesMadeTrue
 }
 
 // parseInput parses the input into a slice of Equation values
