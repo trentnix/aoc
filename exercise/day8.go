@@ -55,8 +55,8 @@ func (d *Day8) RunFromInput(w io.Writer, input []string) {
 	w.Write([]byte(fmt.Sprintf("Day 8 - Part 1 - The number of antinodes in the map is %d.\n", numberAntinodes)))
 
 	// // part 2
-	// numLoops := d.Part2(antennaMap)
-	// w.Write([]byte(fmt.Sprintf("Day 6 - Part 2 - The number of new blocks that result in a loop is %d.\n", numLoops)))
+	numberAntinodes = d.Part2(antennaMap)
+	w.Write([]byte(fmt.Sprintf("Day 8 - Part 2 - The number of antinodes in the map is %d.\n", numberAntinodes)))
 }
 
 // Part1 calculates antinode locations and counts the number of antinodes (the rules are specified in
@@ -67,7 +67,7 @@ func (d *Day8) Part1(antennaMap *AntennaMap) int {
 	antinodeMap := antennaMap.Copy()
 	for _, antennas := range antennaFrequencies {
 		for _, antenna := range antennas {
-			d.SetAntinodes(antinodeMap, antenna, antennas, '#')
+			d.SetAntinodes(antinodeMap, antenna, antennas, '#', false)
 		}
 	}
 
@@ -76,9 +76,21 @@ func (d *Day8) Part1(antennaMap *AntennaMap) int {
 	return antinodeCount
 }
 
-// Part2
-func (d *Day8) Part2() int {
-	return 0
+// Part2 calculates antinode locations and counts the number of repeating antinodes (the rules are
+// specified in the readme for the day)
+func (d *Day8) Part2(antennaMap *AntennaMap) int {
+	antennaFrequencies := d.getUniqueFrequencies(antennaMap)
+
+	antinodeMap := antennaMap.Copy()
+	for _, antennas := range antennaFrequencies {
+		for _, antenna := range antennas {
+			d.SetAntinodes(antinodeMap, antenna, antennas, '#', true)
+		}
+	}
+
+	antinodeCount := antinodeMap.countOccurences('#')
+
+	return antinodeCount
 }
 
 // parseData
@@ -110,7 +122,11 @@ func (d *Day8) getUniqueFrequencies(a *AntennaMap) map[rune][]AntennaMapCoordina
 	return antennaFrequencies
 }
 
-func (d *Day8) SetAntinodes(a *AntennaMap, sourceAntenna AntennaMapCoordinate, antennaPositions []AntennaMapCoordinate, marker rune) {
+// SetAntinodes processes the antennaPositions relative to the sourceAntenna and applies the marker value
+// to the specified AntennaMap for any discovered antinodes. The repeatingAntinodes parameter determines
+// whether only a single antinode exists when comparing a pair of antennas on the same frequency or
+// whether the antinodes repeat.
+func (d *Day8) SetAntinodes(a *AntennaMap, sourceAntenna AntennaMapCoordinate, antennaPositions []AntennaMapCoordinate, marker rune, repeatingAntinodes bool) {
 	if a == nil || len(a.frequency) == 0 || len(a.frequency[0]) == 0 {
 		return
 	}
@@ -127,28 +143,39 @@ func (d *Day8) SetAntinodes(a *AntennaMap, sourceAntenna AntennaMapCoordinate, a
 		deltaX := position.x - sourceAntenna.x
 		deltaY := position.y - sourceAntenna.y
 
-		// set the position in line
-		antinodePositionX := deltaX + position.x
-		antinodePositionY := deltaY + position.y
+		if repeatingAntinodes {
+			for i := 1; true; i++ {
+				// set the position in line
+				antinodePositionX := deltaX*i + position.x
+				antinodePositionY := deltaY*i + position.y
 
-		if antinodePositionX < 0 || antinodePositionY < 0 || antinodePositionX >= rowSize || antinodePositionY >= colSize {
-			continue
+				if antinodePositionX < 0 || antinodePositionY < 0 || antinodePositionX >= rowSize || antinodePositionY >= colSize {
+					// the position is not on the grid
+					break
+				}
+
+				a.frequency[antinodePositionY][antinodePositionX] = '#'
+			}
+		} else {
+			// set the position in line
+			antinodePositionX := deltaX + position.x
+			antinodePositionY := deltaY + position.y
+
+			if antinodePositionX >= 0 && antinodePositionY >= 0 && antinodePositionX < rowSize && antinodePositionY < colSize {
+				// the position is on the grid
+				a.frequency[antinodePositionY][antinodePositionX] = '#'
+			}
 		}
 
-		a.frequency[antinodePositionY][antinodePositionX] = '#'
+		if repeatingAntinodes {
+			if len(antennaPositions) > 1 {
+				a.frequency[position.y][position.x] = '#'
+			}
+		}
 	}
 }
 
-// getAbsDifference returns the absolute value of the difference between p1 and p2
-func getAbsDifference(p1, p2 int) int {
-	difference := p1 - p2
-	if difference < 0 {
-		difference *= -1
-	}
-
-	return difference
-}
-
+// countOccurences navigates the entire AntennaMap to count the occurrences of the specified value
 func (a *AntennaMap) countOccurences(r rune) int {
 	numOccurences := 0
 	for _, row := range a.frequency {
@@ -183,7 +210,7 @@ func (a *AntennaMap) Print() {
 	fmt.Println("Grid:")
 	for _, row := range a.frequency {
 		for _, cell := range row {
-			fmt.Printf("%c ", cell) // Print each rune with a space
+			fmt.Printf("%c", cell) // Print each rune with a space
 		}
 		fmt.Println() // Newline after each row
 	}
