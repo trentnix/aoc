@@ -28,7 +28,7 @@ func TestDay8Part1(t *testing.T) {
 	expectedValue := 14
 
 	if calculatedValue != expectedValue {
-		t.Errorf("Day 7 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
+		t.Errorf("Day 8 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
 	}
 }
 
