@@ -77,7 +77,9 @@ func (d *Day9) Part1(m DiskMap) int64 {
 	return diskData.CalculateChecksum()
 }
 
-// Part2
+// Part2 takes the specified DiskMap, creates a DiskData instance, compresses it using
+// whole file compression (according to the assignment rules), and calculates the checksum
+// of the DiskData instance
 func (d *Day9) Part2(m DiskMap) int64 {
 	diskData := NewDiskData(m)
 	diskData.CompressWholeFiles(m)

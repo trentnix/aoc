@@ -1,4 +1,4 @@
-// day_template.go is the implementation for the TBD day of the Advent of Code 2024
+// dayX.go is the implementation for the TBD day of the Advent of Code 2024
 package exercise
 
 import (
