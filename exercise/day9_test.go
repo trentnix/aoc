@@ -31,4 +31,15 @@ func TestDay9Part1(t *testing.T) {
 }
 
 func TestDay9Part2(t *testing.T) {
+	input := "2333133121414131402"
+
+	d9 := Day9{}
+	diskMap := d9.parseInput(input)
+
+	calculatedValue := d9.Part2(diskMap)
+	expectedValue := int64(2858)
+
+	if calculatedValue != expectedValue {
+		t.Errorf("Day 9 - Part 2 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
+	}
 }

@@ -22,6 +22,7 @@ type (
 		Index           int
 		FileLength      int
 		FreeSpaceLength int
+		StartIndex      int
 	}
 
 	DiskData  []DiskBlock
@@ -63,6 +64,9 @@ func (d *Day9) RunFromInput(w io.Writer, input []string) {
 
 	inputChecksum := d.Part1(diskMap)
 	w.Write([]byte(fmt.Sprintf("Day 9 - Part 1 - The checksum of the input is %d.\n", inputChecksum)))
+
+	inputChecksum = d.Part2(diskMap)
+	w.Write([]byte(fmt.Sprintf("Day 9 - Part 2 - The checksum of the input is %d.\n", inputChecksum)))
 }
 
 // Part1 takes the specified DiskMap, creates a DiskData instance, compresses it, and
@@ -74,8 +78,10 @@ func (d *Day9) Part1(m DiskMap) int64 {
 }
 
 // Part2
-func (d *Day9) Part2() int {
-	return 0
+func (d *Day9) Part2(m DiskMap) int64 {
+	diskData := NewDiskData(m)
+	diskData.CompressWholeFiles(m)
+	return diskData.CalculateChecksum()
 }
 
 // parseInput processes an input string into a DiskMap instance
@@ -118,19 +124,20 @@ func (d *Day9) parseInput(input string) DiskMap {
 func NewDiskData(m DiskMap) DiskData {
 	var diskData DiskData
 
-	index := 0
-	for _, mapBlock := range m {
-		for i := 0; i < mapBlock.FileLength; i++ {
-			diskBlock := DiskBlock{Id: mapBlock.Index, HasValue: true}
+	diskDataIndex := 0
+	for index := 0; index < len(m); index++ {
+		m[index].StartIndex = diskDataIndex
+		for i := 0; i < m[index].FileLength; i++ {
+			diskBlock := DiskBlock{Id: m[index].Index, HasValue: true}
 			diskData = append(diskData, diskBlock)
-			index++
 		}
 
-		for i := 0; i < mapBlock.FreeSpaceLength; i++ {
-			diskBlock := DiskBlock{Id: mapBlock.Index, HasValue: false}
+		for i := 0; i < m[index].FreeSpaceLength; i++ {
+			diskBlock := DiskBlock{Id: m[index].Index, HasValue: false}
 			diskData = append(diskData, diskBlock)
-			index++
 		}
+
+		diskDataIndex += m[index].FileLength + m[index].FreeSpaceLength
 	}
 
 	return diskData
@@ -162,6 +169,71 @@ func (d DiskData) Compress() {
 	}
 }
 
+// CompressWholeFiles takes the specified DiskData instance and fills in the free
+// space from the beginning of the disk with entire "files" from the end of the disk,
+// trying each file once from the end to the beginning
+func (d DiskData) CompressWholeFiles(m DiskMap) {
+	for f := len(m) - 1; f >= 0; f-- {
+		file := m[f]
+		fileLength := file.FileLength
+		if fileLength == 0 {
+			continue
+		}
+
+		originalStart := file.StartIndex
+		needed := fileLength
+
+		currentRunStart := -1
+		currentRunLength := 0
+
+		chosenRunStart := -1
+
+		// Find a free space run that is fully to the left of originalStart
+		for i := 0; i < len(d); i++ {
+			if !d[i].HasValue {
+				if currentRunStart == -1 {
+					currentRunStart = i
+				}
+				currentRunLength++
+				// Check if we found a sufficiently large run
+				if currentRunLength >= needed {
+					// Check leftward condition
+					if currentRunStart+needed <= originalStart {
+						chosenRunStart = currentRunStart
+						break
+					} else {
+						// Even though large enough, not leftward.
+						// Continue scanning. Reset and keep looking.
+						// Move to next block after currentRunStart
+						i = currentRunStart + 1
+						currentRunStart = -1
+						currentRunLength = 0
+					}
+				}
+			} else {
+				// Non-free block, reset the run
+				currentRunStart = -1
+				currentRunLength = 0
+			}
+		}
+
+		if chosenRunStart == -1 {
+			// No suitable run found
+			continue
+		}
+
+		// Move the file
+		for j := 0; j < fileLength; j++ {
+			d[chosenRunStart+j] = DiskBlock{Id: file.Index, HasValue: true}
+			d[originalStart+j] = DiskBlock{} // free the old location
+		}
+
+		// Update DiskMap
+		file.StartIndex = chosenRunStart
+		m[f] = file
+	}
+}
+
 // CalculateChecksum iterates of the DiskBlock entries of the specified DiskData instance
 // and calculates the checksum (according to the rules in the assignment):
 //
@@ -172,7 +244,7 @@ func (d DiskData) CalculateChecksum() int64 {
 	var checksum int64
 	for i := 0; i < len(d); i++ {
 		if !d[i].HasValue {
-			break
+			continue
 		}
 
 		checksum += int64(i) * int64(d[i].Id)
