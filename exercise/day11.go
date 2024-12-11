@@ -71,73 +71,43 @@ func (d *Day11) RunFromInput(w io.Writer, input []string) {
 // Order doesn't matter, so we keep track of the number of instances of a stone with a specific inscription
 // and apply the rules accordingly
 func (d *Day11) ProcessStones(input []uint64, blinks int) uint64 {
-	odds := make(map[uint64]uint64)
-	evens := make(map[uint64]uint64)
-
+	stones := make(map[uint64]uint64)
 	for _, stone := range input {
-		numDigits := len(strconv.FormatUint(stone, 10))
-
-		if numDigits%2 == 0 {
-			evens[stone] += 1
-		} else {
-			odds[stone] += 1
-		}
+		stones[stone]++
 	}
 
 	for i := 0; i < blinks; i++ {
-		newOdds := make(map[uint64]uint64)
-		newEvens := make(map[uint64]uint64)
-
-		// process a blink
-		for key, numElements := range odds {
+		newStones := make(map[uint64]uint64)
+		for key, numElements := range stones {
 			if key == 0 {
-				newOdds[1] += numElements
+				newStones[1] += numElements
 				continue
 			}
 
-			newKey := key * defaultMultiplier
-			keyString := strconv.FormatUint(newKey, 10)
-
+			keyString := strconv.FormatUint(key, 10)
 			if len(keyString)%2 == 0 {
-				newEvens[newKey] += numElements
+				// even number of digits
+				middleIndex := len(keyString) / 2
+				leftString := d.removeLeadingZeroes(keyString[:middleIndex])
+				rightString := d.removeLeadingZeroes(keyString[middleIndex:])
+
+				left, _ := strconv.ParseUint(leftString, 10, 64)
+				right, _ := strconv.ParseUint(rightString, 10, 64)
+
+				newStones[left] += numElements
+				newStones[right] += numElements
 			} else {
-				newOdds[newKey] += numElements
+				// odd number of digits
+				newStones[key*defaultMultiplier] += numElements
 			}
 		}
 
-		for key, numElements := range evens {
-			stoneAsString := strconv.FormatUint(key, 10)
-
-			middleIndex := len(stoneAsString) / 2
-			leftString := d.removeLeadingZeroes(stoneAsString[:middleIndex])
-			rightString := d.removeLeadingZeroes(stoneAsString[middleIndex:])
-
-			left, _ := strconv.ParseUint(leftString, 10, 64)
-			right, _ := strconv.ParseUint(rightString, 10, 64)
-
-			if len(leftString)%2 == 0 {
-				newEvens[left] += numElements
-			} else {
-				newOdds[left] += numElements
-			}
-
-			if len(rightString)%2 == 0 {
-				newEvens[right] += numElements
-			} else {
-				newOdds[right] += numElements
-			}
-		}
-
-		evens = newEvens
-		odds = newOdds
+		stones = newStones
 	}
 
 	numStones := uint64(0)
-	for key := range odds {
-		numStones += odds[key]
-	}
-	for key := range evens {
-		numStones += evens[key]
+	for key := range stones {
+		numStones += stones[key]
 	}
 
 	return numStones
