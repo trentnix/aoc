@@ -47,7 +47,6 @@ func (d *Day11) RunFromInput(w io.Writer, input []string) {
 	}
 
 	stones := d.parseInput(input[0])
-	stonesP2 := d.parseInput(input[0])
 
 	// part 1
 	numBlinks := 25
@@ -56,7 +55,7 @@ func (d *Day11) RunFromInput(w io.Writer, input []string) {
 
 	// part 1
 	numBlinks = 75
-	numStones = d.ProcessStones(stonesP2, numBlinks)
+	numStones = d.ProcessStones(stones, numBlinks)
 	w.Write([]byte(fmt.Sprintf("Day 11 - Part 2 - The number of stones after %d blinks is %d.\n", numBlinks, numStones)))
 }
 
