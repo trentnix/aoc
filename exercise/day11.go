@@ -88,8 +88,8 @@ func (d *Day11) ProcessStones(input []uint64, blinks int) uint64 {
 			if len(keyString)%2 == 0 {
 				// even number of digits
 				middleIndex := len(keyString) / 2
-				leftString := d.removeLeadingZeroes(keyString[:middleIndex])
-				rightString := d.removeLeadingZeroes(keyString[middleIndex:])
+				leftString := keyString[:middleIndex]
+				rightString := keyString[middleIndex:]
 
 				left, _ := strconv.ParseUint(leftString, 10, 64)
 				right, _ := strconv.ParseUint(rightString, 10, 64)
@@ -111,17 +111,6 @@ func (d *Day11) ProcessStones(input []uint64, blinks int) uint64 {
 	}
 
 	return numStones
-}
-
-// removeLeadingZeroes takes a string of digits and removes any leading 0s
-func (d *Day11) removeLeadingZeroes(stone string) string {
-	for i := 0; i < len(stone); i++ {
-		if stone[i] != '0' {
-			return stone[i:]
-		}
-	}
-
-	return "0"
 }
 
 // parseInput parses the specified input into a slice of string values by separating
