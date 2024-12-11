@@ -19,11 +19,6 @@ type (
 	}
 )
 
-const (
-	// this is the value used to multiply a stone engraving
-	defaultMultiplier = uint64(2024)
-)
-
 // GetName returns the name of the day 11 exercise
 func (d *Day11) GetName() string {
 	return d.name
@@ -98,7 +93,7 @@ func (d *Day11) ProcessStones(input []uint64, blinks int) uint64 {
 				newStones[right] += numElements
 			} else {
 				// odd number of digits
-				newStones[key*defaultMultiplier] += numElements
+				newStones[key*2024] += numElements
 			}
 		}
 
