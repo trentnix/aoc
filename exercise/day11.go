@@ -52,64 +52,95 @@ func (d *Day11) RunFromInput(w io.Writer, input []string) {
 	}
 
 	stones := d.parseInput(input[0])
+	stonesP2 := d.parseInput(input[0])
 
 	// part 1
 	numBlinks := 25
-	numStones := d.Part1(stones, numBlinks)
+	numStones := d.ProcessStones(stones, numBlinks)
 	w.Write([]byte(fmt.Sprintf("Day 11 - Part 1 - The number of stones after %d blinks is %d.\n", numBlinks, numStones)))
+
+	// part 1
+	numBlinks = 75
+	numStones = d.ProcessStones(stonesP2, numBlinks)
+	w.Write([]byte(fmt.Sprintf("Day 11 - Part 2 - The number of stones after %d blinks is %d.\n", numBlinks, numStones)))
 }
 
-// Part1 applies the rules of a 'blink' (per the day's assignment) and determines the number of
+// ProcessStones applies the rules of a 'blink' (per the day's assignment) and determines the number of
 // stones after 25 blinks
-func (d *Day11) Part1(stones []string, blinks int) int {
-	for i := 0; i < blinks; i++ {
-		stones = d.blink(stones)
-		if stones == nil {
-			log.Fatalf("blink failed")
+//
+// Order doesn't matter, so we keep track of the number of instances of a stone with a specific inscription
+// and apply the rules accordingly
+func (d *Day11) ProcessStones(input []uint64, blinks int) uint64 {
+	odds := make(map[uint64]uint64)
+	evens := make(map[uint64]uint64)
+
+	for _, stone := range input {
+		numDigits := len(strconv.FormatUint(stone, 10))
+
+		if numDigits%2 == 0 {
+			evens[stone] += 1
+		} else {
+			odds[stone] += 1
 		}
 	}
 
-	return len(stones)
-}
+	for i := 0; i < blinks; i++ {
+		newOdds := make(map[uint64]uint64)
+		newEvens := make(map[uint64]uint64)
 
-// Part2
-func (d *Day11) Part2() int {
-	return 0
-}
-
-// blink applies the rules of a 'blink' to the set of stones specified
-//
-//   - a stone with 0 engraved turns into a stone with 1 engraved
-//   - a stone with an even number of digits engraved turns into two stones engraved with
-//     the left half of the digits and the right half of the digits
-//   - a stone that doesn't fall into one of those categories has the value engraved
-//     multiplied by 2024
-func (d *Day11) blink(stones []string) []string {
-	var stonesAfterBlink []string
-	for _, stone := range stones {
-		switch {
-		case stone == "0":
-			stonesAfterBlink = append(stonesAfterBlink, "1")
-		case len(stone)%2 == 0:
-			middle := len(stone) / 2
-
-			stonesAfterBlink = append(stonesAfterBlink, d.removeLeadingZeroes(stone[:middle]))
-			stonesAfterBlink = append(stonesAfterBlink, d.removeLeadingZeroes(stone[middle:]))
-
-		default:
-			value, err := strconv.ParseUint(stone, 10, 64)
-			if err != nil {
-				fmt.Println("Error converting string to uint64:", err)
-				return nil
+		// process a blink
+		for key, numElements := range odds {
+			if key == 0 {
+				newOdds[1] += numElements
+				continue
 			}
 
-			value *= defaultMultiplier
-			newStone := strconv.FormatUint(value, 10)
-			stonesAfterBlink = append(stonesAfterBlink, newStone)
+			newKey := key * defaultMultiplier
+			keyString := strconv.FormatUint(newKey, 10)
+
+			if len(keyString)%2 == 0 {
+				newEvens[newKey] += numElements
+			} else {
+				newOdds[newKey] += numElements
+			}
 		}
+
+		for key, numElements := range evens {
+			stoneAsString := strconv.FormatUint(key, 10)
+
+			middleIndex := len(stoneAsString) / 2
+			leftString := d.removeLeadingZeroes(stoneAsString[:middleIndex])
+			rightString := d.removeLeadingZeroes(stoneAsString[middleIndex:])
+
+			left, _ := strconv.ParseUint(leftString, 10, 64)
+			right, _ := strconv.ParseUint(rightString, 10, 64)
+
+			if len(leftString)%2 == 0 {
+				newEvens[left] += numElements
+			} else {
+				newOdds[left] += numElements
+			}
+
+			if len(rightString)%2 == 0 {
+				newEvens[right] += numElements
+			} else {
+				newOdds[right] += numElements
+			}
+		}
+
+		evens = newEvens
+		odds = newOdds
 	}
 
-	return stonesAfterBlink
+	numStones := uint64(0)
+	for key := range odds {
+		numStones += odds[key]
+	}
+	for key := range evens {
+		numStones += evens[key]
+	}
+
+	return numStones
 }
 
 // removeLeadingZeroes takes a string of digits and removes any leading 0s
@@ -125,6 +156,17 @@ func (d *Day11) removeLeadingZeroes(stone string) string {
 
 // parseInput parses the specified input into a slice of string values by separating
 // the input by a space
-func (d *Day11) parseInput(input string) []string {
-	return strings.Split(input, " ")
+func (d *Day11) parseInput(input string) []uint64 {
+	var iStones []uint64
+
+	stones := strings.Split(input, " ")
+	for _, stone := range stones {
+		iStone, err := strconv.ParseUint(stone, 10, 64)
+		if err != nil {
+			fmt.Printf("could not convert %s", stone)
+		}
+		iStones = append(iStones, iStone)
+	}
+
+	return iStones
 }
