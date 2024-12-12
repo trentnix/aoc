@@ -87,7 +87,7 @@ func TestDay12Part2Simple(t *testing.T) {
 	expectedValue := 80
 
 	if calculatedValue != expectedValue {
-		t.Errorf("Day 12 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
+		t.Errorf("Day 12 - Part 2 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
 	}
 }
 
@@ -108,7 +108,7 @@ func TestDay12Part2Simple1(t *testing.T) {
 	expectedValue := 236
 
 	if calculatedValue != expectedValue {
-		t.Errorf("Day 12 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
+		t.Errorf("Day 12 - Part 2 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
 	}
 }
 
@@ -130,7 +130,7 @@ func TestDay12Part2Simple2(t *testing.T) {
 	expectedValue := 368
 
 	if calculatedValue != expectedValue {
-		t.Errorf("Day 12 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
+		t.Errorf("Day 12 - Part 2 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
 	}
 }
 
@@ -156,6 +156,6 @@ func TestDay12Part2(t *testing.T) {
 	expectedValue := 1206
 
 	if calculatedValue != expectedValue {
-		t.Errorf("Day 12 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
+		t.Errorf("Day 12 - Part 2 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
 	}
 }
