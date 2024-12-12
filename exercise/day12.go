@@ -251,7 +251,6 @@ func (d *Day12) countCorners(section []GardenNode) int {
 		nodeMap[[2]int{n.row, n.col}] = n
 	}
 
-	// Visited maps for each direction
 	visitedUp := make(map[*GardenNode]bool)
 	visitedDown := make(map[*GardenNode]bool)
 	visitedLeft := make(map[*GardenNode]bool)
@@ -260,9 +259,8 @@ func (d *Day12) countCorners(section []GardenNode) int {
 	// For left/right vertices, we move vertically (up/down)
 	// For up/down vertices, we move horizontally (left/right)
 
-	// DFS for vertical vertices (for left/right)
-	var dfsVertical func(*GardenNode, bool) []GardenNode
-	dfsVertical = func(start *GardenNode, checkLeft bool) []GardenNode {
+	// vertical vertices (for left/right)
+	dfsVertical := func(start *GardenNode, checkLeft bool) []GardenNode {
 		// checkLeft = true means we're forming a vertex of nodes with left=true
 		// otherwise, right=true
 		visited := visitedLeft
@@ -301,9 +299,8 @@ func (d *Day12) countCorners(section []GardenNode) int {
 		return vertexNodes
 	}
 
-	// DFS for horizontal vertices (for up/down)
-	var dfsHorizontal func(*GardenNode, bool) []GardenNode
-	dfsHorizontal = func(start *GardenNode, checkUp bool) []GardenNode {
+	// horizontal vertices (for up/down)
+	dfsHorizontal := func(start *GardenNode, checkUp bool) []GardenNode {
 		// checkUp = true means we're forming a vertex of nodes with up=true
 		// otherwise, down=true
 		visited := visitedUp
@@ -342,10 +339,8 @@ func (d *Day12) countCorners(section []GardenNode) int {
 		return vertexNodes
 	}
 
-	// Iterate over each node in the section
 	for i := range section {
 		n := &section[i]
-		// If node has left=true and not visited in left direction
 		if n.left && !visitedLeft[n] {
 			v := dfsVertical(n, true) // build vertical vertex for left
 			if len(v) > 0 {
@@ -353,7 +348,6 @@ func (d *Day12) countCorners(section []GardenNode) int {
 			}
 		}
 
-		// If node has right=true and not visited in right direction
 		if n.right && !visitedRight[n] {
 			v := dfsVertical(n, false) // build vertical vertex for right
 			if len(v) > 0 {
@@ -361,7 +355,6 @@ func (d *Day12) countCorners(section []GardenNode) int {
 			}
 		}
 
-		// If node has up=true and not visited in up direction
 		if n.up && !visitedUp[n] {
 			v := dfsHorizontal(n, true) // build horizontal vertex for up
 			if len(v) > 0 {
@@ -369,7 +362,6 @@ func (d *Day12) countCorners(section []GardenNode) int {
 			}
 		}
 
-		// If node has down=true and not visited in down direction
 		if n.down && !visitedDown[n] {
 			v := dfsHorizontal(n, false) // build horizontal vertex for down
 			if len(v) > 0 {
@@ -378,6 +370,7 @@ func (d *Day12) countCorners(section []GardenNode) int {
 		}
 	}
 
+	// return the sum of the vertices
 	return len(up) + len(down) + len(left) + len(right)
 }
 
