@@ -121,6 +121,7 @@ func (d *Day12) Part2(garden Garden) int {
 	return price
 }
 
+// parseInput parses the file input into a Garden struct
 func (d *Day12) parseInput(input []string) Garden {
 	if len(input) == 0 {
 		return nil
@@ -239,6 +240,74 @@ func (d *Day12) calculatePerimeter(garden Garden, section []GardenNode) int {
 // deterimines the number of *sides* a section has, which is necessary for calculating
 // the cost in Part 2 of the assignment
 func (d *Day12) countCorners(section []GardenNode) int {
+	var numCorners int
+
+	// Create a lookup map for quick node access by (row,col)
+	nodeMap := make(map[[2]int]*GardenNode)
+	for i := range section {
+		n := &section[i]
+		nodeMap[[2]int{n.row, n.col}] = n
+	}
+
+	// count left corners
+	for _, node := range section {
+		if node.left {
+			if node.up {
+				numCorners++
+			} else {
+				nextRow := node.row - 1
+				if nextRow >= 0 {
+					index := [2]int{nextRow, node.col}
+					upNode := nodeMap[index]
+					if upNode != nil && !upNode.left && upNode.val == node.val {
+						numCorners++
+					}
+				}
+			}
+
+			if node.down {
+				numCorners++
+			} else {
+				nextRow := node.row + 1
+				index := [2]int{nextRow, node.col}
+				downNode := nodeMap[index]
+				if downNode != nil && !downNode.left && downNode.val == node.val {
+					numCorners++
+				}
+			}
+		}
+
+		if node.right {
+			if node.up {
+				numCorners++
+			} else {
+				nextRow := node.row - 1
+				if nextRow >= 0 {
+					index := [2]int{nextRow, node.col}
+					upNode := nodeMap[index]
+					if upNode != nil && !upNode.right && upNode.val == node.val {
+						numCorners++
+					}
+				}
+			}
+
+			if node.down {
+				numCorners++
+			} else {
+				nextRow := node.row + 1
+				index := [2]int{nextRow, node.col}
+				downNode := nodeMap[index]
+				if downNode != nil && !downNode.right && downNode.val == node.val {
+					numCorners++
+				}
+			}
+		}
+	}
+
+	return numCorners
+}
+
+func (d *Day12) countVertices(section []GardenNode) int {
 	up := [][]GardenNode{}
 	down := [][]GardenNode{}
 	left := [][]GardenNode{}
