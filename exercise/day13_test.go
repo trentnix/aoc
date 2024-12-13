@@ -5,31 +5,38 @@ import (
 )
 
 func TestDay13Part1(t *testing.T) {
-	// input := []string{
-	// 	"190: 10 19",
-	// 	"32613: 81 40 213",
-	// 	"83: 113 5",
-	// 	"156: 15 6",
-	// 	"13290: 6 8 6 15",
-	// 	"161011: 16 10 13",
-	// 	"192: 113 8 14",
-	// 	"210313: 9 13 18 13",
-	// 	"292: 11 6 16 20",
-	// }
+	input := []string{
+		"Button A: X+94, Y+34",
+		"Button B: X+22, Y+67",
+		"Prize: X=8400, Y=5400",
+		"",
+		"Button A: X+26, Y+66",
+		"Button B: X+67, Y+21",
+		"Prize: X=12748, Y=12176",
+		"",
+		"Button A: X+17, Y+86",
+		"Button B: X+84, Y+37",
+		"Prize: X=7870, Y=6450",
+		"",
+		"Button A: X+69, Y+23",
+		"Button B: X+27, Y+71",
+		"Prize: X=18641, Y=10279",
+	}
 
-	// d13 := Day13{}
+	d13 := Day13{}
 
-	// equations, err := d13.parseInput(input)
-	// if err != nil {
-	// 	t.Fatalf("Day 13 - Part 1 - Unable to parse the input")
-	// }
+	games := d13.parseInput(input)
 
-	// calculatedValue := d13.Part1(equations)
-	// expectedValue := 12345
+	prizesWon, minimumTokensSpent := d13.Part1(games)
+	expectedPrizesWon := 2
+	expectedTokensSpent := 480
 
-	// if calculatedValue != expectedValue {
-	// 	t.Errorf("Day 13 - Part 1 Test:\nwant %v\ngot %v\n", expectedValue, calculatedValue)
-	// }
+	if prizesWon != expectedPrizesWon {
+		t.Errorf("Day 13 - Part 1 (prizes) Test:\nwant %v\ngot %v\n", expectedPrizesWon, prizesWon)
+	}
+	if minimumTokensSpent != expectedTokensSpent {
+		t.Errorf("Day 13 - Part 1 (tokens) Test:\nwant %v\ngot %v\n", expectedTokensSpent, minimumTokensSpent)
+	}
 }
 
 func TestDay13Part2(t *testing.T) {
