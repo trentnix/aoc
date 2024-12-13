@@ -67,9 +67,9 @@ func TestDay13Part2(t *testing.T) {
 	expectedTokensSpent := int64(875318608908)
 
 	if prizesWon != expectedPrizesWon {
-		t.Errorf("Day 13 - Part 1 (prizes) Test:\nwant %v\ngot %v\n", expectedPrizesWon, prizesWon)
+		t.Errorf("Day 13 - Part 2 (prizes) Test:\nwant %v\ngot %v\n", expectedPrizesWon, prizesWon)
 	}
 	if minimumTokensSpent != expectedTokensSpent {
-		t.Errorf("Day 13 - Part 1 (tokens) Test:\nwant %v\ngot %v\n", expectedTokensSpent, minimumTokensSpent)
+		t.Errorf("Day 13 - Part 2 (tokens) Test:\nwant %v\ngot %v\n", expectedTokensSpent, minimumTokensSpent)
 	}
 }
