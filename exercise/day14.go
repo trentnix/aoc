@@ -190,6 +190,8 @@ func (d *Day14) Part2(robots []Robot, gridX, gridY int) int {
 		}
 
 		if !overlap {
+			// it turns out the Christmas tree is visible when the robots are all in a distinct location
+
 			// fmt.Printf("seconds: %d\n", seconds)
 			// d.printGrid(robotMap)
 			// fmt.Printf("\n\n\n")
@@ -235,6 +237,7 @@ func (d *Day14) parseInput(input []string) []Robot {
 	return robots
 }
 
+// printGrid pretty-prints the grid to be able to visually identify the Christmas tree
 func (d *Day14) printGrid(robotMap [][]int) {
 	for _, row := range robotMap {
 		for _, element := range row {
