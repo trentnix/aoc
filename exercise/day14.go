@@ -55,7 +55,11 @@ func (d *Day14) RunFromInput(w io.Writer, input []string) {
 	gridX = 101
 	gridY = 103
 	safetyFactor := d.Part1(robots, seconds, gridX, gridY)
-	w.Write([]byte(fmt.Sprintf("Day 12 - Part 1 - The safety factor after %d seconds for a %d by %d grid is %d.\n", seconds, gridX, gridY, safetyFactor)))
+	w.Write([]byte(fmt.Sprintf("Day 14 - Part 1 - The safety factor after %d seconds for a %d by %d grid is %d.\n", seconds, gridX, gridY, safetyFactor)))
+
+	// Part2
+	secondsToTree := d.Part2(robots, gridX, gridY)
+	w.Write([]byte(fmt.Sprintf("Day 14 - Part 2 - The tree is visible after %d seconds.\n", secondsToTree)))
 }
 
 // Part1 determines where the robots will be after the specified number of seconds and calculates
@@ -85,16 +89,6 @@ func (d *Day14) Part1(robots []Robot, seconds, gridX, gridY int) int {
 	}
 
 	robotMap := d.robotsToGrid(robots, gridX, gridY)
-	// for _, row := range robotMap {
-	// 	for _, element := range row {
-	// 		if element == 0 {
-	// 			fmt.Printf(".")
-	// 		} else {
-	// 			fmt.Printf("%d", element)
-	// 		}
-	// 	}
-	// 	fmt.Printf("\n")
-	// }
 
 	middleY := gridY / 2
 	middleX := gridX / 2
@@ -116,6 +110,29 @@ func (d *Day14) Part1(robots []Robot, seconds, gridX, gridY int) int {
 	}
 
 	return safetyFactor
+}
+
+// moveRobots moves the robots to a new position after 1 second
+func (d *Day14) moveRobots(robots []Robot, sizeX, sizeY int) {
+	for i := 0; i < len(robots); i++ {
+		newX := robots[i].x + robots[i].velocityX
+		newY := robots[i].y + robots[i].velocityY
+
+		if newX < 0 {
+			newX = newX + sizeX
+		} else if newX >= sizeX {
+			newX = newX % sizeX
+		}
+
+		if newY < 0 {
+			newY = newY + sizeY
+		} else if newY >= sizeY {
+			newY = newY % sizeY
+		}
+
+		robots[i].x = newX
+		robots[i].y = newY
+	}
 }
 
 // countRobots counts the robots in the specified robots grid using the specified
@@ -153,9 +170,33 @@ func (d *Day14) robotsToGrid(robots []Robot, sizeX, sizeY int) [][]int {
 	return grid
 }
 
-// Part2
-func (d *Day14) Part2() int {
-	return 0
+// Part2 tries to find when the robots are arranged into a Christmas tree,
+// which should correlate to when all robots are on a distinct location
+func (d *Day14) Part2(robots []Robot, gridX, gridY int) int {
+	seconds := 0
+	for {
+		seconds++
+		d.moveRobots(robots, gridX, gridY)
+		robotMap := d.robotsToGrid(robots, gridX, gridY)
+
+		overlap := false
+		for _, row := range robotMap {
+			for _, element := range row {
+				if element > 1 {
+					overlap = true
+				}
+			}
+		}
+
+		if !overlap {
+			fmt.Printf("seconds: %d\n", seconds)
+			d.printGrid(robotMap)
+			fmt.Printf("\n\n\n")
+			break
+		}
+	}
+
+	return seconds
 }
 
 // parseInput takes the specified input and returns a slice of Robot instances
@@ -191,4 +232,17 @@ func (d *Day14) parseInput(input []string) []Robot {
 	}
 
 	return robots
+}
+
+func (d *Day14) printGrid(robotMap [][]int) {
+	for _, row := range robotMap {
+		for _, element := range row {
+			if element == 0 {
+				fmt.Printf(".")
+			} else {
+				fmt.Printf("%d", element)
+			}
+		}
+		fmt.Printf("\n")
+	}
 }

@@ -36,6 +36,3 @@ func TestDay14Part1(t *testing.T) {
 		t.Errorf("Day 14 - Part 1 (safety factor) Test:\nwant %v\ngot %v\n", expectedSafetyFactor, safetyFactor)
 	}
 }
-
-func TestDay14Part2(t *testing.T) {
-}
