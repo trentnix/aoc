@@ -58,6 +58,7 @@ func (d *Day14) RunFromInput(w io.Writer, input []string) {
 	w.Write([]byte(fmt.Sprintf("Day 14 - Part 1 - The safety factor after %d seconds for a %d by %d grid is %d.\n", seconds, gridX, gridY, safetyFactor)))
 
 	// Part2
+	// need fresh input because the previous robots have been moved 100 seconds as part of Part 1
 	robots = d.parseInput(input)
 	secondsToTree := d.Part2(robots, gridX, gridY)
 	w.Write([]byte(fmt.Sprintf("Day 14 - Part 2 - The tree is visible after %d seconds.\n", secondsToTree)))
