@@ -58,6 +58,7 @@ func (d *Day14) RunFromInput(w io.Writer, input []string) {
 	w.Write([]byte(fmt.Sprintf("Day 14 - Part 1 - The safety factor after %d seconds for a %d by %d grid is %d.\n", seconds, gridX, gridY, safetyFactor)))
 
 	// Part2
+	robots = d.parseInput(input)
 	secondsToTree := d.Part2(robots, gridX, gridY)
 	w.Write([]byte(fmt.Sprintf("Day 14 - Part 2 - The tree is visible after %d seconds.\n", secondsToTree)))
 }
@@ -189,9 +190,9 @@ func (d *Day14) Part2(robots []Robot, gridX, gridY int) int {
 		}
 
 		if !overlap {
-			fmt.Printf("seconds: %d\n", seconds)
-			d.printGrid(robotMap)
-			fmt.Printf("\n\n\n")
+			// fmt.Printf("seconds: %d\n", seconds)
+			// d.printGrid(robotMap)
+			// fmt.Printf("\n\n\n")
 			break
 		}
 	}
