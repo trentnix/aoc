@@ -4,35 +4,65 @@ import (
 	"testing"
 )
 
+func TestDay15Part1Smaller(t *testing.T) {
+	input := []string{
+		"########",
+		"#..O.O.#",
+		"##@.O..#",
+		"#...O..#",
+		"#.#.O..#",
+		"#...O..#",
+		"#......#",
+		"########",
+		"",
+		"<^^>>>vv<v>>v<<",
+	}
+
+	d15 := Day15{}
+
+	boxMap, instructions := d15.parseInput(input)
+
+	sumBoxCoordinates := d15.Part1(boxMap, instructions)
+	expectedSumBoxCoordinates := 2028
+
+	if sumBoxCoordinates != expectedSumBoxCoordinates {
+		t.Errorf("Day 15 - Part 1 (sum GPS coordinates) Test:\nwant %v\ngot %v\n", expectedSumBoxCoordinates, sumBoxCoordinates)
+	}
+}
+
 func TestDay15Part1(t *testing.T) {
-	// input := []string{
-	// 	"p=0,4 v=3,-3",
-	// 	"p=6,3 v=-1,-3",
-	// 	"p=10,3 v=-1,2",
-	// 	"p=2,0 v=2,-1",
-	// 	"p=0,0 v=1,3",
-	// 	"p=3,0 v=-2,-2",
-	// 	"p=7,6 v=-1,-3",
-	// 	"p=3,0 v=-1,-2",
-	// 	"p=9,3 v=2,3",
-	// 	"p=7,3 v=-1,2",
-	// 	"p=2,4 v=2,-3",
-	// 	"p=9,5 v=-3,-3",
-	// }
+	input := []string{
+		"##########",
+		"#..O..O.O#",
+		"#......O.#",
+		"#.OO..O.O#",
+		"#..O@..O.#",
+		"#O#..O...#",
+		"#O..O..O.#",
+		"#.OO.O.OO#",
+		"#....O...#",
+		"##########",
+		"",
+		"<vv>^<v^>v>^vv^v>v<>v^v<v<^vv<<<^><<><>>v<vvv<>^v^>^<<<><<v<<<v^vv^v>^",
+		"vvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v",
+		"><>vv>v^v^<>><>>>><^^>vv>v<^^^>>v^v^<^^>v^^>v^<^v>v<>>v^v^<v>v^^<^^vv<",
+		"<<v<^>>^^^^>>>v^<>vvv^><v<<<>^^^vv^<vvv>^>v<^^^^v<>^>vvvv><>>v^<<^^^^^",
+		"^><^><>>><>^^<<^^v>>><^<v>^<vv>>v>>>^v><>^v><<<<v>>v<v<v>vvv>^<><<>^><",
+		"^>><>^v<><^vvv<^^<><v<<<<<><^v<<<><<<^^<v<^^^><^>>^<v^><<<^>>^v<v^v<v^",
+		">^>>^v>vv>^<<^v<>><<><<v<<v><>v<^vv<<<>^^v^>^^>>><<^v>>v^v><^^>>^<>vv^",
+		"<><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>",
+		"^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>",
+		"v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^",
+	}
 
-	// d15 := Day15{}
+	d15 := Day15{}
 
-	// var seconds, gridX, gridY int
-	// seconds = 100
-	// gridX = 11
-	// gridY = 7
+	boxMap, instructions := d15.parseInput(input)
 
-	// robots := d15.parseInput(input)
+	sumBoxCoordinates := d15.Part1(boxMap, instructions)
+	expectedSumBoxCoordinates := 10092
 
-	// safetyFactor := d15.Part1(robots, seconds, gridX, gridY)
-	// expectedSafetyFactor := 12
-
-	// if safetyFactor != expectedSafetyFactor {
-	// 	t.Errorf("Day 15 - Part 1 (safety factor) Test:\nwant %v\ngot %v\n", expectedSafetyFactor, safetyFactor)
-	// }
+	if sumBoxCoordinates != expectedSumBoxCoordinates {
+		t.Errorf("Day 15 - Part 1 (sum GPS coordinates) Test:\nwant %v\ngot %v\n", expectedSumBoxCoordinates, sumBoxCoordinates)
+	}
 }
