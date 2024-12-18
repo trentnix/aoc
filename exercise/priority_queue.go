@@ -1,10 +1,10 @@
-// day16_priority_queue.go defines a PriorityQueue for use in the Day 16
+// priority_queue.go defines a PriorityQueue for use in various exercises
 // solution
 package exercise
 
 // Priority Queue Item
 type State struct {
-	node      *ReindeerMazeNode
+	node      *MazeNode
 	direction int
 	cost      int
 	index     int // For heap management
