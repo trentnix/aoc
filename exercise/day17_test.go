@@ -18,7 +18,7 @@ func TestDay17Part1Sample1(t *testing.T) {
 	program := d17.parseInput(input)
 
 	_ = d17.Part1(program)
-	expectedOutput := 1
+	expectedOutput := uint64(1)
 
 	if program.B != expectedOutput {
 		t.Errorf("Day 17 - Part 1 (C=9) Test:\nwant %v\ngot %v\n", expectedOutput, program.B)
@@ -85,7 +85,7 @@ func TestDay17Part1Sample4(t *testing.T) {
 	program := d17.parseInput(input)
 
 	_ = d17.Part1(program)
-	expectedOutput := 26
+	expectedOutput := uint64(26)
 
 	if program.B != expectedOutput {
 		t.Errorf("Day 17 - Part 1 (B=29) Test:\nwant %v\ngot %v\n", expectedOutput, program.B)
@@ -106,7 +106,7 @@ func TestDay17Part1Sample5(t *testing.T) {
 	program := d17.parseInput(input)
 
 	_ = d17.Part1(program)
-	expectedOutput := 44354
+	expectedOutput := uint64(44354)
 
 	if program.B != expectedOutput {
 		t.Errorf("Day 17 - Part 1 (B=2024 and C=43690) Test:\nwant %v\ngot %v\n", expectedOutput, program.B)
@@ -155,5 +155,65 @@ func TestDay17Part1Input(t *testing.T) {
 	}
 }
 
+func TestDay17Part2TestConfirm(t *testing.T) {
+	input := []string{
+		"Register A: 117440",
+		"Register B: 0",
+		"Register C: 0",
+		"",
+		"Program: 0,3,5,4,3,0",
+	}
+
+	d17 := Day17{}
+
+	program := d17.parseInput(input)
+
+	output := d17.Part1(program)
+	expectedOutput := "0,3,5,4,3,0"
+
+	if output != expectedOutput {
+		t.Errorf("Day 17 - Part 2 (find A where the output matches) Test:\nwant %v\ngot %v\n", expectedOutput, output)
+	}
+}
+
 func TestDay17Part2(t *testing.T) {
+	input := []string{
+		"Register A: 2024",
+		"Register B: 0",
+		"Register C: 0",
+		"",
+		"Program: 0,3,5,4,3,0",
+	}
+
+	d17 := Day17{}
+
+	program := d17.parseInput(input)
+
+	output := d17.Part2(program)
+	expectedOutput := uint64(117440)
+
+	if output != expectedOutput {
+		t.Errorf("Day 17 - Part 2 (find A where the output matches) Test:\nwant %v\ngot %v\n", expectedOutput, output)
+	}
+}
+
+func TestDay17Part2Input(t *testing.T) {
+	input := []string{
+		"Register A: 236548287712877",
+		"Register B: 0",
+		"Register C: 0",
+		"",
+		"Program: 2,4,1,3,7,5,1,5,0,3,4,3,5,5,3,0",
+	}
+
+	d17 := Day17{}
+
+	program := d17.parseInput(input)
+
+	output := d17.Part1(program)
+	expectedOutput := "2,4,1,3,7,5,1,5,0,3,4,3,5,5,3,0"
+
+	if output != expectedOutput {
+		t.Errorf("Day 17 - Part 2 (find A where the output matches -input) Test:\nwant %v\ngot %v\n", expectedOutput, output)
+	}
 }

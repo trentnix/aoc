@@ -4,6 +4,7 @@ package exercise
 import (
 	"fmt"
 	"io"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -18,11 +19,12 @@ type (
 	}
 
 	DeviceProgram struct {
-		A       int
-		B       int
-		C       int
-		program []int
-		output  string
+		A         uint64
+		B         uint64
+		C         uint64
+		program   []int
+		output    string
+		outputInt []int
 	}
 )
 
@@ -53,15 +55,62 @@ func (d *Day17) RunFromInput(w io.Writer, input []string) {
 	program := d.parseInput(input)
 	programOutput := d.Part1(program)
 	w.Write([]byte(fmt.Sprintf("Day 17 - Part 1 - The output of the program is: \n%s.\n", programOutput)))
+
+	program = d.parseInput(input)
+	lowestInitialA := d.Part2(program)
+	w.Write([]byte(fmt.Sprintf("Day 17 - Part 2 - The lowest positive value for A that causes the program to output a copy of itself is %d\n", lowestInitialA)))
 }
 
 // Part1 runs the program specified by the input and returns the output
 func (d *Day17) Part1(program *DeviceProgram) string {
-	return program.Run()
+	program.Run()
+	return program.output
+}
+
+// Part2 iterates over the program in reverse, shifts the A input by 3 bits, and tries all
+// values for each location until a solution is found
+func (d *Day17) Part2(program *DeviceProgram) uint64 {
+	originalProgram := make([]int, len(program.program))
+	copy(originalProgram, program.program)
+
+	lenProgram := len(originalProgram)
+
+	valuesToCheck := []uint64{0, 1, 2, 3, 4, 5, 6, 7}
+
+	for len(valuesToCheck) > 0 {
+		// pull an A off the queue
+		originalA := valuesToCheck[0]
+		valuesToCheck = valuesToCheck[1:]
+
+		for i := 0; i < 8; i++ {
+			// try a value of A where we shift the original value by 3 bits and then
+			// add one of the possible 3 bit values
+			newA := (originalA << 3) + uint64(i)
+			program.A = newA
+
+			// run the program with the value for A
+			program.Run()
+			// find the start index of the output (from the end) of the original program
+			startIndex := lenProgram - len(program.outputInt)
+
+			if slices.Equal(program.outputInt, originalProgram[startIndex:]) {
+				valuesToCheck = append(valuesToCheck, newA)
+				if len(program.outputInt) == lenProgram {
+					// the output matches the full program
+					return newA
+				}
+			}
+
+			program.output = ""
+			program.outputInt = nil
+		}
+	}
+
+	return 0
 }
 
 // Run navigates through the instruction set of the specified DeviceProgram and returns the resulting output
-func (p *DeviceProgram) Run() string {
+func (p *DeviceProgram) Run() {
 	nextOperation := 0
 	for {
 		nextOperation = p.DoInstruction(nextOperation)
@@ -69,8 +118,6 @@ func (p *DeviceProgram) Run() string {
 			break
 		}
 	}
-
-	return p.output
 }
 
 // DoInstruction identifies the opCode at the specified index and its subsequent operand,
@@ -99,7 +146,7 @@ func (p *DeviceProgram) RunOpCode(opCode int, operand int) (int, bool) {
 	case 0:
 		p.A = p.dvOp(p.A, comboOperand)
 	case 1:
-		p.B = p.B ^ operand
+		p.B = p.B ^ uint64(operand)
 	case 2:
 		p.B = comboOperand % 8
 	case 3:
@@ -109,7 +156,9 @@ func (p *DeviceProgram) RunOpCode(opCode int, operand int) (int, bool) {
 	case 4:
 		p.B = p.B ^ p.C
 	case 5:
-		outResult := strconv.Itoa(comboOperand % 8)
+		comboOperandMod := int(comboOperand % 8)
+		outResult := strconv.Itoa(comboOperandMod)
+		p.outputInt = append(p.outputInt, comboOperandMod)
 		if len(p.output) == 0 {
 			p.output += outResult
 		} else {
@@ -125,8 +174,8 @@ func (p *DeviceProgram) RunOpCode(opCode int, operand int) (int, bool) {
 }
 
 // the *dv instruction returns the divident / 2*operand (the truncated, not rounded value)
-func (p *DeviceProgram) dvOp(dividend int, operand int) int {
-	divisor := 1 << operand // calculate 2^operand
+func (p *DeviceProgram) dvOp(dividend uint64, operand uint64) uint64 {
+	divisor := uint64(1) << operand // calculate 2^operand
 
 	// integer division in Go truncates automatically
 	return dividend / divisor
@@ -134,8 +183,8 @@ func (p *DeviceProgram) dvOp(dividend int, operand int) int {
 
 // getComboOperandValue calculates the combo operand given the specified operand. Some
 // instructions use the combo operand
-func (p *DeviceProgram) getComboOperandValue(operand int) int {
-	comboOperand := operand
+func (p *DeviceProgram) getComboOperandValue(operand int) uint64 {
+	comboOperand := uint64(operand)
 	switch operand {
 	case 4:
 		comboOperand = p.A
@@ -146,11 +195,6 @@ func (p *DeviceProgram) getComboOperandValue(operand int) int {
 	}
 
 	return comboOperand
-}
-
-// Part2
-func (d *Day17) Part2() int {
-	return 0
 }
 
 // parseInput parses the specified input data and returns a corresponding DeviceProgram instance
@@ -179,8 +223,8 @@ func (d *Day17) parseInput(input []string) *DeviceProgram {
 }
 
 // parseRegisterValue extracts an integer value from a register line
-func parseRegisterValue(line string) int {
+func parseRegisterValue(line string) uint64 {
 	parts := strings.Split(line, ":")
 	value, _ := strconv.Atoi(strings.TrimSpace(parts[1]))
-	return value
+	return uint64(value)
 }
