@@ -47,6 +47,9 @@ func (d *Day19) RunFromInput(w io.Writer, input []string) {
 
 	possibleTowelDesigns := d.Part1(towels, towelDesigns)
 	w.Write([]byte(fmt.Sprintf("Day 19 - Part 1 - The number of possible towel designs: %d\n", possibleTowelDesigns)))
+
+	sumTowelCombinationsThatSolve := d.Part2(towels, towelDesigns)
+	w.Write([]byte(fmt.Sprintf("Day 19 - Part 2 - The sum of the towel combinations tha that solve the designs is: %d\n", sumTowelCombinationsThatSolve)))
 }
 
 // Part1 iterates through the various designs and determines if the specified
@@ -54,7 +57,7 @@ func (d *Day19) RunFromInput(w io.Writer, input []string) {
 func (d *Day19) Part1(towels Towels, towelDesigns TowelDesigns) int {
 	numPossible := 0
 	for _, design := range towelDesigns {
-		if d.canBuildTowel(design, towels) {
+		if d.canBuildDesign(design, towels) {
 			numPossible++
 		}
 	}
@@ -64,7 +67,7 @@ func (d *Day19) Part1(towels Towels, towelDesigns TowelDesigns) int {
 
 // canBuildTowel determines whether the specified towelDesign can be built
 // from the set of towels.
-func (d *Day19) canBuildTowel(towelDesign string, towels []string) bool {
+func (d *Day19) canBuildDesign(towelDesign string, towels []string) bool {
 	dict := make(map[string]bool)
 	for _, d := range towels {
 		dict[d] = true
@@ -90,9 +93,40 @@ func (d *Day19) canBuildTowel(towelDesign string, towels []string) bool {
 	return dp[n]
 }
 
-// Part2
-func (d *Day19) Part2() int {
-	return 0
+// Part2 determines the sum of the possible ways to solve for each towel design
+func (d *Day19) Part2(towels Towels, towelDesigns TowelDesigns) int {
+	sumTowelCombinationsThatSolve := 0
+	for _, design := range towelDesigns {
+		sumTowelCombinationsThatSolve += d.countWaysToBuildDesign(design, towels)
+	}
+
+	return sumTowelCombinationsThatSolve
+}
+
+// countWaysToBuildTowel counts the number of sets of towels that can be
+// used to solve the specified towelDesign
+func (d *Day19) countWaysToBuildDesign(towelDesign string, towels []string) int {
+	// Convert towelDesigns into a set for quick lookups
+	dict := make(map[string]bool)
+	for _, d := range towels {
+		dict[d] = true
+	}
+
+	n := len(towelDesign)
+	dp := make([]int, n+1)
+	dp[0] = 1 // There's one way to form the empty substring: do nothing
+
+	for i := 1; i <= n; i++ {
+		for j := 0; j < i; j++ {
+			// If towel[j:i] is a valid segment
+			if dict[towelDesign[j:i]] {
+				// Add all ways to form towel[:j] to dp[i]
+				dp[i] += dp[j]
+			}
+		}
+	}
+
+	return dp[n]
 }
 
 // parseInput takes the assignment's specified input and parses it into Towels and
