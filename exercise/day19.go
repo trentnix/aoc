@@ -76,10 +76,10 @@ func (d *Day19) canBuildDesign(towelDesign string, towels []string) bool {
 	n := len(towelDesign)
 	// dp[i] will be true if we can form towel[:i] from the given designs
 	dp := make([]bool, n+1)
-	dp[0] = true // Empty string can always be formed
+	dp[0] = true // empty string
 
 	for i := 1; i <= n; i++ {
-		// Check all possible substrings that end at i
+		// check all possible substrings that end at i
 		for j := 0; j < i; j++ {
 			// if dp[j] is true (we can form towel[:j]) and
 			// towel[j:i] is in the dictionary, then dp[i] = true.
@@ -106,7 +106,7 @@ func (d *Day19) Part2(towels Towels, towelDesigns TowelDesigns) int {
 // countWaysToBuildTowel counts the number of sets of towels that can be
 // used to solve the specified towelDesign
 func (d *Day19) countWaysToBuildDesign(towelDesign string, towels []string) int {
-	// Convert towelDesigns into a set for quick lookups
+	// convert towelDesigns into a set for quick lookups
 	dict := make(map[string]bool)
 	for _, d := range towels {
 		dict[d] = true
@@ -114,13 +114,13 @@ func (d *Day19) countWaysToBuildDesign(towelDesign string, towels []string) int 
 
 	n := len(towelDesign)
 	dp := make([]int, n+1)
-	dp[0] = 1 // There's one way to form the empty substring: do nothing
+	dp[0] = 1 // empty substring: do nothing
 
 	for i := 1; i <= n; i++ {
 		for j := 0; j < i; j++ {
-			// If towel[j:i] is a valid segment
+			// if towel[j:i] is a valid segment
 			if dict[towelDesign[j:i]] {
-				// Add all ways to form towel[:j] to dp[i]
+				// add all ways to form towel[:j] to dp[i]
 				dp[i] += dp[j]
 			}
 		}
