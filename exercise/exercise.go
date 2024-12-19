@@ -133,6 +133,13 @@ func init() {
 	}
 
 	RegisterExercise(day18)
+
+	day19 := &Day19{
+		name: "2024: Day 19",
+		file: "data/day19/input.txt",
+	}
+
+	RegisterExercise(day19)
 }
 
 // RegisterExercise provides a way for an Exercise to register itself
