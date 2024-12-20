@@ -468,6 +468,112 @@ func findMazeEdge(graph MazeGraph, from, to MazePoint) *MazeEdge {
 	return nil
 }
 
+// findMazePath returns the graph nodes on the lowest-cost path in the maze.
+// The parameters are:
+// - graph is the MazeGraph being traversed
+// - start is the start node in the graph
+// - end is the end node in the graph
+// - startDirection determines which direction from the starting point the traversal will begin
+// - calculateCost is a function to compute the cost of moving from one state to the next
+//
+// The return value is a slice of MazePoint representing the path, or nil if no path is found.
+func findBestMazePath(graph MazeGraph, start, end MazePoint, startDirection int, calculateCost func(s *State, e *MazeEdge) int) *MazePath {
+	pq := &PriorityQueue{}
+	heap.Init(pq)
+
+	// store minimum costs to each node from each direction
+	visited := make(map[MazePoint]map[int]int)
+
+	// initialize the priority queue with the start node and direction
+	heap.Push(pq, &State{
+		node:      graph[start],
+		direction: startDirection,
+		cost:      0,
+		prev:      nil, // This will help reconstruct the path
+	})
+
+	var finalState *State
+
+	for pq.Len() > 0 {
+		// get the node with the smallest cost
+		current := heap.Pop(pq).(*State)
+
+		// we reached the end, save the final state
+		if current.node.point == end {
+			finalState = current
+			break
+		}
+
+		// Check if we've seen a better cost for this node and direction
+		if visited[current.node.point] == nil {
+			visited[current.node.point] = make(map[int]int)
+		}
+		if costSoFar, ok := visited[current.node.point][current.direction]; ok && costSoFar <= current.cost {
+			// we found a cheaper cost before, skip this one
+			continue
+		}
+
+		visited[current.node.point][current.direction] = current.cost
+
+		for _, edge := range current.node.edges {
+			// calculate the cost to move to the neighbor
+			newCost := calculateCost(current, &edge)
+
+			// if we've visited the neighbor at this direction cheaper, skip
+			if visited[edge.to.point] != nil {
+				if prevCost, ok := visited[edge.to.point][edge.direction]; ok && prevCost <= newCost {
+					continue
+				}
+			}
+
+			// add the neighbor to the priority queue
+			heap.Push(pq, &State{
+				node:      edge.to,
+				direction: edge.direction,
+				cost:      newCost,
+				prev:      current, // Track the path
+			})
+		}
+	}
+
+	// If no path was found, return nil
+	if finalState == nil {
+		return nil
+	}
+
+	// Reconstruct the path from the end to the start
+	var path MazePath
+	var positions []MazePoint
+	path.cost = finalState.node.point.pointCost
+	for state := finalState; state != nil; state = state.prev {
+		positions = append(positions, (*state).node.point)
+	}
+
+	// Reverse the path to get it from start to end
+	for i, j := 0, len(positions)-1; i < j; i, j = i+1, j-1 {
+		positions[i], positions[j] = positions[j], positions[i]
+	}
+
+	path.positions = positions
+
+	return &path
+}
+
+// findLocation will find the y,x location of the specified val in the specified
+// Maze
+func (maze *Maze) findLocation(val rune) MazePoint {
+	r := *maze
+	for y := 0; y < len(r); y++ {
+		for x := 0; x < len(r[0]); x++ {
+			if r[y][x].val == val {
+				return MazePoint{Y: y, X: x}
+			}
+		}
+	}
+
+	return MazePoint{Y: -1, X: -1}
+}
+
 // Print prints the current maze to stdout
 func (maze *Maze) Print() {
 	m := *maze

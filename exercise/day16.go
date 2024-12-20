@@ -111,21 +111,6 @@ func (d *Day16) parseInput(input []string) Maze {
 	return maze
 }
 
-// findLocation will find the y,x location of the specified val in the specified
-// Maze
-func (reindeerMaze *Maze) findLocation(val rune) MazePoint {
-	r := *reindeerMaze
-	for y := 0; y < len(r); y++ {
-		for x := 0; x < len(r[0]); x++ {
-			if r[y][x].val == val {
-				return MazePoint{Y: y, X: x}
-			}
-		}
-	}
-
-	return MazePoint{Y: -1, X: -1}
-}
-
 func calculateReindeerMazeCost(s *State, e *MazeEdge) int {
 	turnCost := 0
 	if e.direction != s.direction {

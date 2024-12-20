@@ -5,6 +5,7 @@ package exercise
 // Priority Queue Item
 type State struct {
 	node      *MazeNode
+	prev      *State
 	direction int
 	cost      int
 	index     int // For heap management
@@ -45,4 +46,17 @@ func (pq *PriorityQueue) Pop() interface{} {
 	item.index = -1 // For safety
 	*pq = old[0 : n-1]
 	return item
+}
+
+// IsTurn determines whether the particular node in the graph represents a change in direction
+func (s *State) IsTurn() bool {
+	if s.prev == nil {
+		return false
+	}
+
+	if s.direction == s.prev.direction {
+		return false
+	}
+
+	return true
 }
