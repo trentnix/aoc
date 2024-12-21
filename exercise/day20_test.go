@@ -58,10 +58,10 @@ func TestDay20Part2(t *testing.T) {
 
 	raceTrack := d20.parseInput(input)
 
-	numCheats := d20.Part2Manhattan(raceTrack, 70)
-	expectedNumcheats := 41
+	numCheats := d20.Part2(raceTrack, 70)
+	expectedNumCheats := 41
 
-	if numCheats != expectedNumcheats {
-		t.Errorf("Day 20 - Part 2 (num cheats with minimum 70) Test:\nwant %v\ngot %v\n", expectedNumcheats, numCheats)
+	if numCheats != expectedNumCheats {
+		t.Errorf("Day 20 - Part 2 (num cheats with minimum 70) Test:\nwant %v\ngot %v\n", expectedNumCheats, numCheats)
 	}
 }
