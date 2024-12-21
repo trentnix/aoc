@@ -44,8 +44,16 @@ func (d *Day20) RunFromInput(w io.Writer, input []string) {
 	// part 1
 	numberOfCheatsThatSave100 := d.Part1(raceTrack, 100)
 	w.Write([]byte(fmt.Sprintf("Day 20 - Part 1 - The number of cheats that save 100 is %d.\n", numberOfCheatsThatSave100)))
+
+	// part 2
+	raceTrack = d.parseInput(input)
+	numberOfCheatsThatSave100 = d.Part2(raceTrack, 100)
+	w.Write([]byte(fmt.Sprintf("Day 20 - Part 2 - The number of cheats that save 100 is %d.\n", numberOfCheatsThatSave100)))
 }
 
+// RaceTrackPosition is a Y,X coordinate for a position on the Maze (grid). Maze uses
+// MazePoint, which has a pointCost field, so I didn't want to use that as my map key
+// where I need to use a map for each Maze position. And so, RaceTrackPosition was created.
 type RaceTrackPosition struct {
 	Y, X int
 }
@@ -109,6 +117,54 @@ func (d *Day20) Part1(raceTrack Maze, threshold int) int {
 	return sumCheatsMeetingThresholdForSavings
 }
 
+// Part2 calculates the Manhattan distance between two points on the path and
+// calculates the savings if the path were to skip from the first point to the
+// second point. Only a maximum of 20 skips is allowed.
+func (d *Day20) Part2(raceTrack Maze, threshold int) int {
+	start := raceTrack.findLocation('S')
+	end := raceTrack.findLocation('E')
+
+	path := d.GetMazePath(raceTrack, start, end)
+	// dictionary of positions for quick lookups
+	positionDict := make(map[RaceTrackPosition]int)
+
+	originalPathLength := len(path)
+	for i := 0; i < originalPathLength; i++ {
+		position := RaceTrackPosition{Y: path[i].Y, X: path[i].X}
+		positionDict[position] = path[i].pointCost
+	}
+
+	// cheats is a map of positions where the specified key is the distance saved
+	cheats := make(map[int]int)
+
+	for i := 0; i < originalPathLength; i++ {
+		for j := i + 1; j < originalPathLength; j++ {
+			pathDistance := j - i
+			manhattanDistance := absInt(path[j].Y-path[i].Y) + absInt(path[j].X-path[i].X)
+
+			if manhattanDistance <= 20 {
+				saved := pathDistance - manhattanDistance
+				if saved <= 0 {
+					// no savings
+					continue
+				}
+
+				cheats[saved]++
+			}
+		}
+	}
+
+	sumCheatsMeetingThresholdForSavings := 0
+	for saved, paths := range cheats {
+		if saved >= threshold {
+			// the distance saved exceeds or equals the threshold, add the number of cheats to the running total
+			sumCheatsMeetingThresholdForSavings += paths
+		}
+	}
+
+	return sumCheatsMeetingThresholdForSavings
+}
+
 // GetMazePath calculates the path through the specified maze (as long as there is a single, valid path)
 // and returns a slice of the points traveled (and their relative distance from the provided start point)
 func (d *Day20) GetMazePath(raceTrack Maze, start MazePoint, end MazePoint) []MazePoint {
@@ -149,9 +205,13 @@ func (d *Day20) GetMazePath(raceTrack Maze, start MazePoint, end MazePoint) []Ma
 	return path
 }
 
-// Part2
-func (d *Day20) Part2() int {
-	return 0
+// absInt determines the absolute value of the specified int x
+func absInt(x int) int {
+	if x < 0 {
+		return -x
+	}
+
+	return x
 }
 
 // parseInput
