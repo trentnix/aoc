@@ -24,4 +24,20 @@ func TestDay22Part1(t *testing.T) {
 }
 
 func TestDay22Part2(t *testing.T) {
+	input := []string{
+		"1",
+		"2",
+		"3",
+		"2024",
+	}
+
+	d22 := Day22{}
+
+	bananas := d22.Part2(input, 2000)
+
+	expectedBananas := 23
+
+	if bananas != expectedBananas {
+		t.Errorf("Day 22 - Part 2 (number of bananas) Test:\nwant %v\ngot %v\n", expectedBananas, bananas)
+	}
 }

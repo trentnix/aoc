@@ -4,6 +4,7 @@ package exercise
 import (
 	"fmt"
 	"io"
+	"math"
 	"strconv"
 
 	"github.com/trentnix/aoc2024/fileprocessing"
@@ -45,16 +46,16 @@ func (d *Day22) RunFromInput(w io.Writer, input []string) {
 	w.Write([]byte(fmt.Sprintf("Day 22 - Part 1 - The sum of the secret numbers after 2000 generations is %d.\n", sumSecretNumbers)))
 
 	// part 2
-	// sumCodeComplexity = d.CalculateComplexity(input, 25)
-	// w.Write([]byte(fmt.Sprintf("Day 21 - Part 2 - The sum of the complexity of the provided codes (25 robots) is %d.\n", sumCodeComplexity)))
+	maxBananas := d.Part2(input, 2000)
+	w.Write([]byte(fmt.Sprintf("Day 22 - Part 2 - The maximum number of bananas we can get from the specified buyers is %d.\n", maxBananas)))
 }
 
 // Part1 calculates the secret numbers after 2000 generations
-func (d *Day22) Part1(secretNumbers []string, numGenerated int) int {
+func (d *Day22) Part1(secretNumbers []string, numGenerations int) int {
 	sumSecretNumbers := 0
 	for _, secretNumber := range secretNumbers {
 		secret, _ := strconv.Atoi(secretNumber)
-		for i := 0; i < numGenerated; i++ {
+		for i := 0; i < numGenerations; i++ {
 			secret = calculateSecret(secret)
 		}
 
@@ -64,9 +65,54 @@ func (d *Day22) Part1(secretNumbers []string, numGenerated int) int {
 	return sumSecretNumbers
 }
 
-// Part2
-func (d *Day22) Part2() int {
-	return 0
+// Part2 determines the maximum number of bananas we can retrieve from providing a sequence
+// of changes to the monkey sellers
+func (d *Day22) Part2(secretNumbers []string, numGenerations int) int {
+	// stores the bananas that would result from the sequence of changes (the key)
+	sequencesDiscovered := make(map[[4]int]int)
+
+	for _, secretNumber := range secretNumbers {
+		secret, _ := strconv.Atoi(secretNumber)
+
+		// the changes that correspond to the current secret value
+		changes := make(map[[4]int]bool)
+
+		// the set of changes we'll use as a key to our changes and sequences map
+		//  the value is initialized to a nonsensical value
+		last4 := [4]int{math.MaxInt, math.MaxInt, math.MaxInt, math.MaxInt}
+
+		for i := 0; i < numGenerations; i++ {
+			previousPrice := secret % 10 // last digit
+			secret = calculateSecret(secret)
+			currentPrice := secret % 10 // last digit
+
+			// store a new set of changes by shifting the values
+			last4[0] = last4[1]
+			last4[1] = last4[2]
+			last4[2] = last4[3]
+			last4[3] = currentPrice - previousPrice // change in price from this generation to the last
+
+			if !changes[last4] {
+				// we've now seen this sequence for the current value, so set the changes map for
+				// the set of sequences to true - the monkey sells the first time it sees the sequence,
+				// so we don't care if there's another instance of the sequence that provides a
+				// higher value
+				changes[last4] = true
+				// add the price to the
+				sequencesDiscovered[last4] += currentPrice
+			}
+		}
+	}
+
+	// find maximum number of bananas in the sequences
+	maxBananas := 0
+	for _, sumBananas := range sequencesDiscovered {
+		if sumBananas > maxBananas {
+			maxBananas = sumBananas
+		}
+	}
+
+	return maxBananas
 }
 
 // calculateSecret calculates the secret number according to the rules specified in the assignment:
