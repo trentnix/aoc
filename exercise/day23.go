@@ -53,7 +53,7 @@ func (d *Day23) RunFromInput(w io.Writer, input []string) {
 
 	// part 2
 	connectedComputers := d.Part2(input)
-	w.Write([]byte(fmt.Sprintf("Day 23 - Part 1 - The connected computers are %s.\n", connectedComputers)))
+	w.Write([]byte(fmt.Sprintf("Day 23 - Part 2 - The connected computers are %s.\n", connectedComputers)))
 }
 
 // Part1 computers the number of interconnected computers where at least one computer starts with 't'
