@@ -49,7 +49,11 @@ func (d *Day23) Run(w io.Writer) {
 func (d *Day23) RunFromInput(w io.Writer, input []string) {
 	// part 1
 	numSets := d.Part1(input)
-	w.Write([]byte(fmt.Sprintf("Day 22 - Part 1 - The number of three inter-connected computers that start with 't' is %d.\n", numSets)))
+	w.Write([]byte(fmt.Sprintf("Day 23 - Part 1 - The number of three inter-connected computers that start with 't' is %d.\n", numSets)))
+
+	// part 2
+	connectedComputers := d.Part2(input)
+	w.Write([]byte(fmt.Sprintf("Day 23 - Part 1 - The connected computers are %s.\n", connectedComputers)))
 }
 
 // Part1 computers the number of interconnected computers where at least one computer starts with 't'
@@ -61,8 +65,11 @@ func (d *Day23) Part1(input []string) int {
 }
 
 // Part2
-func (d *Day23) Part2() int {
-	return 0
+func (d *Day23) Part2(input []string) string {
+	computerGraph := NewComputerGraph(input)
+	largestSet := computerGraph.FindLargestConnectedSet()
+	sort.Strings(largestSet)
+	return strings.Join(largestSet, ",")
 }
 
 // NewComputerGraph takes the input and builds a graph of the computers and their
@@ -149,14 +156,109 @@ func HasEntryThatStartsWith(startsWith rune, nodeSet []string) bool {
 	return false
 }
 
-// PrintGraph prints the adjacency list of the graph
-func (g *ComputerGraph) PrintGraph() {
-	for node, neighbors := range g.adjacency {
-		fmt.Printf("%s: ", node)
-		var neighborList []string
-		for neighbor := range neighbors {
-			neighborList = append(neighborList, neighbor)
+// FindLargestConnectedSet navigates through all the connected sets to find the longest
+// and return that set
+func (g *ComputerGraph) FindLargestConnectedSet() []string {
+	indexLongest := -1
+	lenLongest := 0
+	cliques := g.FindAllConnectedSets()
+	for i, clique := range cliques {
+		lenClique := len(clique)
+		if lenClique > lenLongest {
+			lenLongest = lenClique
+			indexLongest = i
 		}
-		fmt.Println(strings.Join(neighborList, ", "))
 	}
+
+	return cliques[indexLongest]
+}
+
+// FindAllConnectedSets returns all 'maximal' clicks which implements the Bron-Kerbosch algorithm
+func (g *ComputerGraph) FindAllConnectedSets() [][]string {
+	var cliques [][]string
+
+	// P (possible nodes)
+	P := make(map[string]bool)
+	for node := range g.adjacency {
+		P[node] = true
+	}
+
+	// R (current clique)
+	R := make(map[string]bool)
+
+	// X (excluded nodes)
+	X := make(map[string]bool)
+
+	var bronKerbosch func(R, P, X map[string]bool)
+	bronKerbosch = func(R, P, X map[string]bool) {
+		if len(P) == 0 && len(X) == 0 {
+			// found a maximal clique
+			clique := make([]string, 0, len(R))
+			for node := range R {
+				clique = append(clique, node)
+			}
+			cliques = append(cliques, clique)
+
+			return
+		}
+
+		// pivot node from P ∪ X
+		var pivot string
+		for node := range P {
+			pivot = node
+			break
+		}
+
+		for node := range X {
+			pivot = node
+			break
+		}
+
+		for node := range P {
+			if g.adjacency[pivot][node] {
+				continue
+			}
+
+			// node is adjacent, so add node to R
+			RNew := copySet(R)
+			RNew[node] = true
+
+			// PNew is intersection of P and the node's neighbors
+			PNew := intersect(P, g.adjacency[node])
+
+			// XNew is intersection of X and the node's neighbors
+			XNew := intersect(X, g.adjacency[node])
+
+			bronKerbosch(RNew, PNew, XNew)
+
+			// remove node from the possible set to the excluded set
+			delete(P, node)
+			X[node] = true
+		}
+	}
+
+	bronKerbosch(R, P, X)
+	return cliques
+}
+
+// copyset does exactly what you think it does - it copies a set to new memory
+func copySet(original map[string]bool) map[string]bool {
+	newSet := make(map[string]bool)
+	for k, v := range original {
+		newSet[k] = v
+	}
+
+	return newSet
+}
+
+// intersect computes the intersection of two sets
+func intersect(a, b map[string]bool) map[string]bool {
+	result := make(map[string]bool)
+	for k := range a {
+		if b[k] {
+			result[k] = true
+		}
+	}
+
+	return result
 }
